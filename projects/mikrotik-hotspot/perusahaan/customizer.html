@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customizer — Template Hotspot MikroTik (V1 Perusahaan)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--accent:#2563eb;--bg:#f1f5f9}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);color:var(--ink);min-height:100vh}
+  header{background:#fff;border-bottom:1px solid var(--line);padding:16px 24px}
+  header h1{font-size:1.15rem;font-weight:800;letter-spacing:-.02em}
+  header p{font-size:.85rem;color:var(--muted);margin-top:2px}
+  .app{display:grid;grid-template-columns:360px 1fr;gap:0;min-height:calc(100vh - 66px)}
+  @media(max-width:900px){.app{grid-template-columns:1fr}}
+
+  /* Controls */
+  .controls{background:#fff;border-right:1px solid var(--line);padding:24px;overflow-y:auto}
+  .group{margin-bottom:22px}
+  .group label{display:block;font-size:.8rem;font-weight:700;margin-bottom:8px;color:#334155}
+  .group .desc{font-size:.75rem;color:var(--muted);margin-top:6px;line-height:1.5}
+  input[type=text]{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;
+    font:inherit;font-size:.95rem}
+  input[type=text]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:.95rem;background:#fff}
+  textarea{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:.9rem;resize:vertical;line-height:1.5}
+  textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.12)}
+  .color-row{display:flex;gap:10px;align-items:center}
+  input[type=color]{width:52px;height:44px;border:1px solid var(--line);border-radius:9px;padding:3px;cursor:pointer;background:#fff}
+  .swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+  .sw{width:26px;height:26px;border-radius:7px;cursor:pointer;border:2px solid #fff;box-shadow:0 0 0 1px var(--line)}
+  .file-btn{display:block;text-align:center;padding:11px;border:1px dashed var(--line);border-radius:9px;
+    cursor:pointer;font-size:.9rem;color:var(--muted);transition:.15s}
+  .file-btn:hover{border-color:var(--accent);color:var(--accent)}
+  .logo-preview{margin-top:10px;display:none;align-items:center;gap:10px}
+  .logo-preview img{width:40px;height:40px;object-fit:contain;border-radius:8px;background:#f8fafc;border:1px solid var(--line)}
+  .logo-preview button{border:none;background:#fee2e2;color:#dc2626;font:inherit;font-weight:600;font-size:.8rem;
+    padding:6px 10px;border-radius:7px;cursor:pointer}
+  .actions{position:sticky;bottom:0;background:#fff;padding-top:14px;border-top:1px solid var(--line);margin-top:8px}
+  .btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font:inherit;font-weight:700;
+    font-size:.95rem;cursor:pointer;text-align:center}
+  .btn-primary{background:var(--accent);color:#fff;margin-bottom:9px}
+  .btn-primary:hover{background:#1d4ed8}
+  .btn-ghost{background:#f1f5f9;color:var(--ink)}
+  .btn-ghost:hover{background:#e2e8f0}
+  .note{font-size:.72rem;color:var(--muted);margin-top:10px;line-height:1.5}
+
+  /* Preview */
+  .preview-wrap{padding:24px;overflow:auto;display:flex;flex-direction:column}
+  .preview-bar{display:flex;gap:8px;margin-bottom:16px;align-items:center}
+  .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:9px;padding:4px}
+  .seg button{border:none;background:transparent;font:inherit;font-weight:600;font-size:.85rem;
+    padding:7px 14px;border-radius:6px;cursor:pointer;color:var(--muted)}
+  .seg button.active{background:var(--accent);color:#fff}
+  .frame-holder{flex:1;display:flex;justify-content:center;align-items:flex-start}
+  iframe{border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 10px 40px -18px rgba(0,0,0,.35);
+    width:100%;height:640px;transition:width .2s}
+  iframe.mobile{width:390px}
+</style>
+</head>
+<body>
+<header>
+  <h1>🎨 Customizer — Template Hotspot MikroTik</h1>
+  <p>V1 Perusahaan · Atur tampilan, lihat preview langsung, lalu download versi kamu.</p>
+</header>
+
+<div class="app">
+  <!-- ================= CONTROLS ================= -->
+  <div class="controls">
+    <div class="group">
+      <label for="company">Nama Perusahaan</label>
+      <input type="text" id="company" placeholder="PT Contoh Sejahtera" value="NAMA PERUSAHAAN ANDA">
+    </div>
+
+    <div class="group">
+      <label for="headline">Judul (Header)</label>
+      <input type="text" id="headline" value="Jaringan WiFi Perusahaan">
+    </div>
+
+    <div class="group">
+      <label for="subtext">Subteks</label>
+      <textarea id="subtext" rows="3">Silakan masuk menggunakan akun perusahaan Anda. Akses internet hanya untuk keperluan kerja sesuai kebijakan yang berlaku.</textarea>
+    </div>
+
+    <div class="group">
+      <label for="initials">Inisial Logo (kalau tidak upload gambar)</label>
+      <input type="text" id="initials" maxlength="3" placeholder="CO" value="CO">
+      <div class="desc">Maks 3 huruf. Dipakai kalau kamu tidak upload logo gambar.</div>
+    </div>
+
+    <div class="group">
+      <label>Logo (opsional)</label>
+      <label class="file-btn" for="logo">📁 Upload logo (PNG/JPG/SVG)</label>
+      <input type="file" id="logo" accept="image/*" style="display:none">
+      <div class="logo-preview" id="logoPrev">
+        <img id="logoImg" alt="logo">
+        <button type="button" id="logoClear">Hapus</button>
+      </div>
+      <div class="desc">Logo di-embed langsung ke file (base64) biar tetap tampil di captive portal tanpa internet. Pakai gambar kecil (&lt; 30 KB).</div>
+    </div>
+
+    <div class="group">
+      <label>Gambar Background Panel (opsional)</label>
+      <label class="file-btn" for="bg">🖼️ Upload gambar background</label>
+      <input type="file" id="bg" accept="image/*" style="display:none">
+      <div class="logo-preview" id="bgPrev">
+        <img id="bgImg" alt="background">
+        <button type="button" id="bgClear">Hapus</button>
+      </div>
+      <div class="desc">Muncul di panel kiri (desktop), mis. foto kantor/tempat. Ada overlay gelap otomatis biar teks tetap terbaca. Kompres dulu (&lt; 200 KB) — ikut di-embed ke file.</div>
+    </div>
+
+    <div class="group">
+      <label for="color">Warna Brand</label>
+      <div class="color-row">
+        <input type="color" id="color" value="#1e40af">
+        <input type="text" id="colorHex" value="#1e40af" style="flex:1">
+      </div>
+      <div class="swatches" id="swatches"></div>
+    </div>
+
+    <div class="group">
+      <label for="font">Font</label>
+      <select id="font">
+        <option value='-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif'>System (default) — paling aman</option>
+        <option value='"Segoe UI",Tahoma,Geneva,Verdana,sans-serif'>Modern Sans</option>
+        <option value='Verdana,Geneva,"DejaVu Sans",sans-serif'>Humanist (Verdana)</option>
+        <option value='"Trebuchet MS","Segoe UI",system-ui,sans-serif'>Rounded / Friendly</option>
+        <option value='"Arial Narrow",Arial,sans-serif'>Condensed</option>
+        <option value='Georgia,"Times New Roman",serif'>Serif / Formal</option>
+        <option value='"Times New Roman",Times,serif'>Serif Classic</option>
+        <option value='Palatino,"Palatino Linotype","Book Antiqua",serif'>Serif Elegant</option>
+        <option value='"Courier New",Courier,monospace'>Monospace / Techy</option>
+        <option value='Consolas,"Lucida Console",Monaco,monospace'>Mono Modern</option>
+      </select>
+      <div class="desc">Semua font di sini tersedia di HP/laptop tanpa perlu internet — penting untuk captive portal.</div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="dlZip">⬇️ Download Template Lengkap (.zip)</button>
+      <button class="btn btn-ghost" id="dlLogin">Download login.html saja</button>
+      <div class="note" id="note">Tips: "Download Lengkap" mengambil semua halaman (login, status, logout, dll) + md5.js + errors.txt sekaligus. Perlu koneksi internet untuk membuat .zip.</div>
+    </div>
+  </div>
+
+  <!-- ================= PREVIEW ================= -->
+  <div class="preview-wrap">
+    <div class="preview-bar">
+      <div class="seg">
+        <button id="segDesktop" class="active" onclick="setDevice('desktop')">🖥️ Desktop</button>
+        <button id="segMobile" onclick="setDevice('mobile')">📱 Mobile</button>
+      </div>
+    </div>
+    <div class="frame-holder">
+      <iframe id="preview" title="Preview"></iframe>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== Template login.html asli (di-embed untuk preview & download) ===== */
+const LOGIN_RAW = `<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>$(hostname) — WiFi Login</title>
+<style>
+  :root{
+    --brand:#1e40af;
+    --brand-dark:#1e3a8a;
+    --bg:#0f172a;
+    --card:#ffffff;
+    --fg:#0f172a;
+    --muted:#64748b;
+    --line:#e2e8f0;
+    --danger:#dc2626;
+    --danger-bg:#fef2f2;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--fg);min-height:100vh;display:flex;
+    background:linear-gradient(135deg,var(--brand-dark),var(--bg));
+  }
+  .layout{display:flex;width:100%;min-height:100vh}
+  .brand-panel{flex:1;color:#fff;padding:56px 48px;display:flex;flex-direction:column;justify-content:space-between}
+  .brand-top{display:flex;align-items:center;gap:14px}
+  .brand-logo{width:56px;height:56px;border-radius:12px;flex:none;background:rgba(255,255,255,.15);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.4rem;letter-spacing:-.02em}
+  .brand-name{font-size:1.15rem;font-weight:700;color:#fff;letter-spacing:-.01em}
+  .brand-head h1{font-size:2rem;font-weight:800;letter-spacing:-.02em;margin-top:28px;line-height:1.15}
+  .brand-head p{color:rgba(255,255,255,.75);margin-top:12px;max-width:360px;font-size:1rem}
+  .brand-foot{font-size:.85rem;color:rgba(255,255,255,.6)}
+  .brand-foot strong{color:#fff}
+  .login-panel{width:min(460px,100%);background:var(--card);padding:48px 40px;display:flex;flex-direction:column;justify-content:center}
+  .lp-head{margin-bottom:24px}
+  .lp-head .mobile-brand{display:none;align-items:center;gap:12px;margin-bottom:18px}
+  .lp-head .mobile-logo{width:48px;height:48px;border-radius:11px;background:var(--brand);flex:none;
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.2rem}
+  .lp-head .mobile-company{font-size:1.05rem;font-weight:700;color:var(--fg);letter-spacing:-.01em}
+  .lp-head h2{font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+  .lp-head p{color:var(--muted);margin-top:6px;font-size:.95rem}
+  .tabs{display:flex;gap:6px;background:#f1f5f9;padding:5px;border-radius:12px;margin:22px 0}
+  .tab{flex:1;border:none;background:transparent;padding:10px;border-radius:8px;font:inherit;font-weight:600;
+    font-size:.9rem;color:var(--muted);cursor:pointer;transition:.2s}
+  .tab.active{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .error{display:none;background:var(--danger-bg);border:1px solid #fecaca;color:var(--danger);
+    padding:11px 14px;border-radius:10px;font-size:.88rem;margin-bottom:18px;font-weight:500}
+  .error.show{display:block}
+  form{display:none;flex-direction:column;gap:14px}
+  form.active{display:flex}
+  .field label{display:block;font-size:.82rem;font-weight:600;color:#334155;margin-bottom:6px}
+  .field input{width:100%;padding:13px 14px;border:1px solid var(--line);border-radius:10px;
+    font:inherit;font-size:1rem;transition:.15s;background:#fff}
+  .field input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(30,64,175,.12)}
+  .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--brand);color:#fff;
+    font:inherit;font-weight:700;font-size:1rem;cursor:pointer;transition:.15s;margin-top:4px}
+  .btn:hover{background:var(--brand-dark)}
+  .btn:active{transform:translateY(1px)}
+  .hint{font-size:.82rem;color:var(--muted);text-align:center;margin-top:2px}
+  .lp-foot{margin-top:28px;padding-top:20px;border-top:1px solid var(--line);font-size:.8rem;color:var(--muted);line-height:1.7}
+  .lp-foot a{color:var(--brand);text-decoration:none;font-weight:600}
+  .meta{margin-top:8px;font-size:.72rem;color:#94a3b8}
+  .credit{margin-top:18px;text-align:center;font-size:.76rem;color:#94a3b8}
+  .credit a{color:var(--brand);text-decoration:none;font-weight:600}
+  @media(max-width:820px){
+    .brand-panel{display:none}
+    .layout{align-items:center;justify-content:center;padding:20px}
+    .login-panel{width:min(440px,100%);border-radius:18px;box-shadow:0 20px 50px -20px rgba(0,0,0,.5);min-height:auto}
+    .lp-head .mobile-brand{display:flex}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="brand-panel">
+    <div class="brand-top">
+      <div class="brand-logo">CO</div>
+      <span class="brand-name">NAMA PERUSAHAAN ANDA</span>
+    </div>
+    <div class="brand-head">
+      <h1>Jaringan WiFi Perusahaan</h1>
+      <p>Silakan masuk menggunakan akun perusahaan Anda. Akses internet hanya untuk keperluan kerja sesuai kebijakan yang berlaku.</p>
+    </div>
+    <div class="brand-foot">
+      Butuh bantuan? Hubungi <strong>IT Helpdesk</strong><br>
+      ext. 123 · it@perusahaan.com
+    </div>
+  </aside>
+  <main class="login-panel">
+    <div class="lp-head">
+      <div class="mobile-brand">
+        <div class="mobile-logo">CO</div>
+        <span class="mobile-company">NAMA PERUSAHAAN ANDA</span>
+      </div>
+      <h2>Masuk ke WiFi</h2>
+      <p>Pilih tipe akses lalu masuk untuk terhubung.</p>
+    </div>
+    <div class="tabs">
+      <button type="button" class="tab active" onclick="showTab('karyawan',this)">Karyawan / Intern</button>
+      <button type="button" class="tab" onclick="showTab('tamu',this)">Tamu</button>
+    </div>
+    $(if error)
+    <div class="error show">$(error)</div>
+    $(endif)
+    <form name="karyawan" class="active" action="$(link-login-only)" method="post" $(if chap-id)onSubmit="return doCHAP(this)"$(endif)>
+      <input type="hidden" name="dst" value="$(link-orig)">
+      <input type="hidden" name="popup" value="true">
+      <div class="field">
+        <label for="k-user">Username</label>
+        <input id="k-user" name="username" type="text" placeholder="nama.karyawan" autocapitalize="off" autocorrect="off" autofocus>
+      </div>
+      <div class="field">
+        <label for="k-pass">Password</label>
+        <input id="k-pass" name="password" type="password" placeholder="••••••••">
+      </div>
+      <button class="btn" type="submit">Masuk</button>
+      <p class="hint">Gunakan akun domain / email perusahaan Anda.</p>
+    </form>
+    <form name="tamu" action="$(link-login-only)" method="post" $(if chap-id)onSubmit="return doCHAP(this)"$(endif)>
+      <input type="hidden" name="dst" value="$(link-orig)">
+      <input type="hidden" name="popup" value="true">
+      <input type="hidden" name="password" value="">
+      <div class="field">
+        <label for="t-code">Kode Akses Tamu</label>
+        <input id="t-code" name="username" type="text" placeholder="Masukkan kode dari resepsionis" autocapitalize="characters" autocorrect="off">
+      </div>
+      <button class="btn" type="submit">Hubungkan</button>
+      <p class="hint">Kode tamu bisa diminta ke resepsionis / host Anda.</p>
+    </form>
+    <div class="lp-foot">
+      Dengan masuk, Anda menyetujui <a href="#" onclick="return false;">Kebijakan Penggunaan (AUP)</a>.
+      <div class="meta">Perangkat: $(mac) · IP: $(ip)</div>
+    </div>
+    <div class="credit">
+      Template dibuat oleh
+      <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a>
+      ·
+      <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
+    </div>
+  </main>
+</div>
+<script>
+  function showTab(name, el){
+    var tabs = document.querySelectorAll('.tab');
+    for (var i=0;i<tabs.length;i++) tabs[i].classList.remove('active');
+    el.classList.add('active');
+    document.forms['karyawan'].classList.toggle('active', name==='karyawan');
+    document.forms['tamu'].classList.toggle('active', name==='tamu');
+    var f = document.forms[name];
+    var input = f.querySelector('input[type=text]');
+    if (input) input.focus();
+  }
+<\/script>
+$(if chap-id)
+<script src="md5.js"><\/script>
+<script>
+  function doCHAP(f){
+    f.password.value = hexMD5('$(chap-id)' + f.password.value + '$(chap-challenge)');
+    return true;
+  }
+<\/script>
+$(endif)
+</body>
+</html>`;
+
+const DEFAULT_FONT = '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+const TEMPLATE_FILES = ['login.html','alogin.html','status.html','logout.html','error.html','errors.txt','md5.js','README.md'];
+
+const opts = {
+  company:'NAMA PERUSAHAAN ANDA', initials:'CO', logoData:null, bgData:null,
+  color:'#1e40af', font:DEFAULT_FONT,
+  headline:'Jaringan WiFi Perusahaan',
+  subtext:'Silakan masuk menggunakan akun perusahaan Anda. Akses internet hanya untuk keperluan kerja sesuai kebijakan yang berlaku.'
+};
+let device='desktop';
+
+/* ---------- helpers ---------- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function hexToRgb(h){h=h.replace('#','');if(h.length===3)h=h.split('').map(c=>c+c).join('');
+  return {r:parseInt(h.substr(0,2),16),g:parseInt(h.substr(2,2),16),b:parseInt(h.substr(4,2),16)};}
+function darken(hex,f){var c=hexToRgb(hex);var d=v=>Math.max(0,Math.round(v*f));
+  var h=n=>n.toString(16).padStart(2,'0');return '#'+h(d(c.r))+h(d(c.g))+h(d(c.b));}
+function slug(s){return (s||'hotspot').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'hotspot';}
+
+/* ---------- branding (dipakai untuk preview & download) ---------- */
+function applyBranding(raw){
+  var rgb = hexToRgb(opts.color);
+  var out = raw
+    .split('--brand:#1e40af;').join('--brand:'+opts.color+';')
+    .split('--brand-dark:#1e3a8a;').join('--brand-dark:'+darken(opts.color,0.8)+';')
+    .split('rgba(30,64,175,.12)').join('rgba('+rgb.r+','+rgb.g+','+rgb.b+',.12)')
+    .split(DEFAULT_FONT).join(opts.font)
+    .split('NAMA PERUSAHAAN ANDA').join(esc(opts.company||'NAMA PERUSAHAAN ANDA'))
+    .split('Jaringan WiFi Perusahaan').join(esc(opts.headline||'Jaringan WiFi Perusahaan'))
+    .split('Silakan masuk menggunakan akun perusahaan Anda. Akses internet hanya untuk keperluan kerja sesuai kebijakan yang berlaku.').join(esc(opts.subtext||' '));
+  var logo = opts.logoData
+    ? '<img src="'+opts.logoData+'" alt="logo" style="height:100%;width:auto;object-fit:contain;display:block">'
+    : esc(opts.initials||'CO');
+  out = out.split('>CO</div>').join('>'+logo+'</div>');
+  if(opts.logoData){
+    // Kalau logo berupa gambar: hilangkan kotak background biar cuma logonya yang tampil.
+    var fix = '<style>.brand-logo,.mobile-logo,.logo{background:transparent!important;width:auto!important;border-radius:0!important}</style>';
+    out = out.replace('</head>', fix+'</head>');
+  }
+  if(opts.bgData){
+    // Gambar background panel kiri + overlay gelap otomatis biar teks tetap terbaca.
+    var d = hexToRgb(darken(opts.color,0.8));
+    var ov = '<style>.brand-panel{background:linear-gradient(135deg,rgba('+d.r+','+d.g+','+d.b+',.82),rgba(15,23,42,.86)),url("'+opts.bgData+'") center/cover no-repeat!important}</style>';
+    out = out.replace('</head>', ov+'</head>');
+  }
+  return out;
+}
+
+/* ---------- preview: bersihkan variabel MikroTik biar tampil rapi ---------- */
+function previewClean(html){
+  return html
+    .replace(/\$\(if [^)]*\)[\s\S]*?\$\(endif\)/g,'')
+    .replace(/\$\(mac\)/g,'AA:BB:CC:DD:EE:FF')
+    .replace(/\$\(ip\)/g,'192.168.100.23')
+    .replace(/\$\(hostname\)/g, esc(opts.company)||'Hotspot')
+    .replace(/\$\([^)]*\)/g,'#');
+}
+
+function render(){
+  var html = previewClean(applyBranding(LOGIN_RAW));
+  document.getElementById('preview').srcdoc = html;
+}
+
+function setDevice(d){
+  device=d;
+  document.getElementById('preview').classList.toggle('mobile', d==='mobile');
+  document.getElementById('segDesktop').classList.toggle('active', d==='desktop');
+  document.getElementById('segMobile').classList.toggle('active', d==='mobile');
+}
+
+/* ---------- downloads ---------- */
+function dl(name, content, type){
+  var blob = new Blob([content], {type:type||'text/html'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1500);
+}
+
+async function downloadZip(){
+  var note=document.getElementById('note');
+  if(typeof JSZip==='undefined'){ note.textContent='⚠️ Gagal memuat JSZip (butuh internet). Sementara pakai "Download login.html saja".'; return; }
+  note.textContent='⏳ Menyiapkan file...';
+  var zip=new JSZip();
+  var gotAny=false;
+  for(var i=0;i<TEMPLATE_FILES.length;i++){
+    var f=TEMPLATE_FILES[i];
+    try{
+      var res=await fetch(f, {cache:'no-store'});
+      if(!res.ok) throw 0;
+      var txt=await res.text();
+      if(f.endsWith('.html')) txt=applyBranding(txt);
+      zip.file(f, txt); gotAny=true;
+    }catch(e){
+      if(f==='login.html'){ zip.file(f, applyBranding(LOGIN_RAW)); gotAny=true; }
+    }
+  }
+  if(!gotAny){ note.textContent='⚠️ Tidak bisa mengambil file. Host customizer ini di folder yang sama dengan template.'; return; }
+  var blob=await zip.generateAsync({type:'blob'});
+  dl(slug(opts.company)+'-hotspot-template.zip', blob, 'application/zip');
+  note.textContent='✅ Selesai! Upload semua isi .zip ke folder hotspot MikroTik.';
+}
+
+/* ---------- wiring ---------- */
+document.getElementById('company').addEventListener('input',function(e){opts.company=e.target.value;render();});
+document.getElementById('headline').addEventListener('input',function(e){opts.headline=e.target.value;render();});
+document.getElementById('subtext').addEventListener('input',function(e){opts.subtext=e.target.value;render();});
+document.getElementById('initials').addEventListener('input',function(e){opts.initials=e.target.value.toUpperCase();e.target.value=opts.initials;render();});
+document.getElementById('color').addEventListener('input',function(e){opts.color=e.target.value;document.getElementById('colorHex').value=e.target.value;render();});
+document.getElementById('colorHex').addEventListener('input',function(e){var v=e.target.value.trim();if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(v)){opts.color=v;document.getElementById('color').value=v.length===4?'#'+v.slice(1).split('').map(c=>c+c).join(''):v;render();}});
+document.getElementById('font').addEventListener('change',function(e){opts.font=e.target.value;render();});
+document.getElementById('logo').addEventListener('change',function(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(){opts.logoData=reader.result;
+    document.getElementById('logoImg').src=reader.result;
+    document.getElementById('logoPrev').style.display='flex';
+    render();};
+  reader.readAsDataURL(file);
+});
+document.getElementById('logoClear').addEventListener('click',function(){
+  opts.logoData=null; document.getElementById('logo').value='';
+  document.getElementById('logoPrev').style.display='none'; render();
+});
+document.getElementById('bg').addEventListener('change',function(e){
+  var file=e.target.files[0]; if(!file) return;
+  var r=new FileReader();
+  r.onload=function(){opts.bgData=r.result;
+    document.getElementById('bgImg').src=r.result;
+    document.getElementById('bgPrev').style.display='flex';
+    render();};
+  r.readAsDataURL(file);
+});
+document.getElementById('bgClear').addEventListener('click',function(){
+  opts.bgData=null; document.getElementById('bg').value='';
+  document.getElementById('bgPrev').style.display='none'; render();
+});
+document.getElementById('dlLogin').addEventListener('click',function(){dl('login.html', applyBranding(LOGIN_RAW));});
+document.getElementById('dlZip').addEventListener('click',downloadZip);
+
+/* preset swatches — mengikuti 12 warna Color Wheel */
+[
+  {n:'Red',            c:'#e23b31'},
+  {n:'Red-Orange',     c:'#e8562c'},
+  {n:'Orange',         c:'#ed6a2c'},
+  {n:'Yellow-Orange',  c:'#f4a93b'},
+  {n:'Yellow',         c:'#f7e93e'},
+  {n:'Yellow-Green',   c:'#c3d640'},
+  {n:'Green',          c:'#3aa24c'},
+  {n:'Blue-Green',     c:'#2ba69a'},
+  {n:'Blue',           c:'#26268f'},
+  {n:'Blue-Violet',    c:'#4b2e91'},
+  {n:'Violet',         c:'#7e4ca0'},
+  {n:'Red-Violet',     c:'#9b2062'}
+].forEach(function(o){
+  var s=document.createElement('div'); s.className='sw'; s.style.background=o.c; s.title=o.n;
+  s.onclick=function(){opts.color=o.c;document.getElementById('color').value=o.c;document.getElementById('colorHex').value=o.c;render();};
+  document.getElementById('swatches').appendChild(s);
+});
+
+render();
+</script>
+</body>
+</html>

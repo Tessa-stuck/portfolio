@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MikroTik Hotspot Templates — Fesal</title>
+<meta name="description" content="Kumpulan template login page hotspot MikroTik open source dengan customizer bawaan. Perusahaan, Cafe, dan Voucher.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff;--fg:#141414;--muted:#6b7280;--line:#e7e7e9;
+    --accent:#2563eb;--accent-soft:#eff4ff;--card:#fafafa;--radius:16px;--max:960px;
+    --ok:#16a34a;--ok-bg:#f0fdf4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg);
+    line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+  h1,h2,h3{line-height:1.2;letter-spacing:-.02em}
+  a{color:inherit}
+  .eyebrow{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:var(--max);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+  .back{font-size:.9rem;font-weight:600;text-decoration:none;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+  .back:hover{color:var(--fg)}
+  .lang-toggle{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--fg)}
+  .lang-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+  header.hero{padding:64px 0 40px}
+  .hero h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:800;margin:14px 0 16px}
+  .hero .lead{font-size:1.1rem;color:var(--muted);max-width:640px}
+  .stack{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px}
+  .tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:.82rem;font-weight:500;color:#333}
+
+  section{padding:24px 0 72px}
+  .versions{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:8px}
+  .ver{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
+  .ver.available{border-color:#dbe6ff}
+  .badge{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
+    text-transform:uppercase;letter-spacing:.05em;padding:5px 11px;border-radius:999px;margin-bottom:14px}
+  .badge.ok{background:var(--ok-bg);color:var(--ok)}
+  .badge.soon{background:#f1f5f9;color:var(--muted)}
+  .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+  .ver h3{font-size:1.25rem;margin-bottom:8px}
+  .ver p{color:#444;font-size:.95rem;flex:1}
+  .ver .who{margin-top:12px;font-size:.82rem;color:var(--muted)}
+  .ver .btns{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px}
+  .btn{display:inline-block;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.9rem;text-decoration:none;transition:.15s}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:#1d4ed8}
+  .btn-ghost{border:1px solid var(--line);color:var(--fg)}
+  .btn-ghost:hover{border-color:var(--fg)}
+  .btn.disabled{background:#f1f5f9;color:#9ca3af;cursor:not-allowed;pointer-events:none}
+
+  .info{background:var(--accent-soft);border:1px solid #dbe6ff;border-radius:14px;padding:18px 22px;margin-top:36px;font-size:.9rem;color:#1e3a8a}
+  .info strong{font-weight:700}
+
+  footer{padding:34px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
+  footer a{color:var(--accent);text-decoration:none;font-weight:600}
+
+  [data-en]{display:none}
+  html[lang="en"] [data-id]{display:none}
+  html[lang="en"] [data-en]{display:inline}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="back" href="../../index.html">← <span data-id>Kembali ke Portfolio</span><span data-en>Back to Portfolio</span></a>
+    <button class="lang-toggle" onclick="toggleLang()"><span data-id>EN</span><span data-en>ID</span></button>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="eyebrow"><span data-id>Proyek Open Source</span><span data-en>Open Source Project</span></span>
+    <h1>MikroTik Hotspot Templates</h1>
+    <p class="lead">
+      <span data-id>Kumpulan template login page (captive portal) hotspot MikroTik yang bersih, responsive, dan ringan — plus <strong>customizer bawaan</strong> biar siapa pun bisa atur warna, font, logo, dan teks tanpa ngoprek kode, lalu download versinya sendiri.</span>
+      <span data-en>A collection of clean, responsive, lightweight MikroTik hotspot login (captive portal) templates — with a <strong>built-in customizer</strong> so anyone can set colors, fonts, logo, and text without touching code, then download their own version.</span>
+    </p>
+    <div class="stack">
+      <span class="tag">HTML/CSS</span><span class="tag">MikroTik</span><span class="tag">Captive Portal</span>
+      <span class="tag">Offline-safe</span><span class="tag">No dependencies</span>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow"><span data-id>Pilih Versi</span><span data-en>Choose a Version</span></span>
+    <div class="versions">
+
+      <!-- V1 Perusahaan -->
+      <div class="ver available">
+        <span class="badge ok"><span class="dot"></span> <span data-id>Tersedia</span><span data-en>Available</span></span>
+        <h3><span data-id>Perusahaan</span><span data-en>Corporate</span></h3>
+        <p data-id>Login bertab: Karyawan/Intern (username + password) & Tamu (kode akses). Set lengkap: login, status, logout, alogin, error — plus dukungan CHAP.</p>
+        <p data-en>Tabbed login: Employee/Intern (username + password) & Guest (access code). Full set: login, status, logout, alogin, error — plus CHAP support.</p>
+        <div class="who"><span data-id>👤 Untuk: karyawan, intern, tamu</span><span data-en>👤 For: employees, interns, guests</span></div>
+        <div class="btns">
+          <a class="btn btn-primary" href="perusahaan/customizer.html"><span data-id>Buka Customizer</span><span data-en>Open Customizer</span></a>
+          <a class="btn btn-ghost" href="perusahaan/login.html" target="_blank"><span data-id>Preview</span><span data-en>Preview</span></a>
+        </div>
+      </div>
+
+      <!-- V2 Cafe -->
+      <div class="ver">
+        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
+        <h3><span data-id>Cafe / Resto / Hotel</span><span data-en>Cafe / Resto / Hotel</span></h3>
+        <p data-id>Fokus tamu: input voucher dari struk/kasir + info durasi paket. Gaya hangat/elegan, welcome message, tombol WhatsApp, banner promo.</p>
+        <p data-en>Guest-focused: voucher input from receipt/cashier + package duration info. Warm/elegant style, welcome message, WhatsApp button, promo banner.</p>
+        <div class="who"><span data-id>☕ Untuk: pelanggan / tamu</span><span data-en>☕ For: customers / guests</span></div>
+        <div class="btns">
+          <span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span>
+        </div>
+      </div>
+
+      <!-- V3 Voucher -->
+      <div class="ver">
+        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
+        <h3><span data-id>Publik / Voucher</span><span data-en>Public / Voucher</span></h3>
+        <p data-id>Fokus konversi: input kode voucher menonjol + tombol "Beli Voucher" (WhatsApp), daftar harga paket, info masa aktif, FAQ singkat.</p>
+        <p data-en>Conversion-focused: prominent voucher input + "Buy Voucher" button (WhatsApp), package price list, validity info, short FAQ.</p>
+        <div class="who"><span data-id>🎫 Untuk: penjualan voucher umum</span><span data-en>🎫 For: public voucher sales</span></div>
+        <div class="btns">
+          <span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info">
+      <span data-id>💡 <strong>Cara pakai:</strong> buka Customizer → atur nama, warna, font, logo → lihat preview langsung → download <strong>login.html</strong> atau <strong>template lengkap (.zip)</strong> → upload ke folder hotspot MikroTik. Semua hasil download offline-safe (tanpa aset eksternal).</span>
+      <span data-en>💡 <strong>How to use:</strong> open the Customizer → set name, color, font, logo → see the live preview → download <strong>login.html</strong> or the <strong>full template (.zip)</strong> → upload to the MikroTik hotspot folder. Every download is offline-safe (no external assets).</span>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <span data-id>Dibuat oleh Fesal</span><span data-en>Built by Fesal</span> ·
+  <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> ·
+  <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
+</footer>
+
+<script>
+  function toggleLang(){
+    var html=document.documentElement;
+    html.setAttribute('lang', html.getAttribute('lang')==='id' ? 'en' : 'id');
+  }
+</script>
+</body>
+</html>
