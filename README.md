@@ -1,4 +1,4 @@
-# Fesal — Personal Page
+# Tessa — Personal Page
 
 Halaman pribadi & portfolio karya open source (networking, software, ngoprek).
 Situs statis, tanpa build step — cukup HTML/CSS/JS.
@@ -21,4 +21,4 @@ Situs statis, tanpa build step — cukup HTML/CSS/JS.
 Lihat `DEPLOY.md`. Hosting via GitHub Pages + custom domain, update cukup `git push`.
 
 ## Kredit
-Fesal · [@arschbx](https://instagram.com/arschbx) · [Tessa-stuck](https://github.com/Tessa-stuck)
+Tessa · [@arschbx](https://instagram.com/arschbx) · [Tessa-stuck](https://github.com/Tessa-stuck)

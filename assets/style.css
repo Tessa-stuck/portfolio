@@ -1,0 +1,86 @@
+/* ===== Shared styles — Tessa personal site ===== */
+:root{
+  --bg:#ffffff;--fg:#141414;--muted:#6b7280;--line:#e7e7e9;
+  --accent:#2563eb;--accent-soft:#eff4ff;--card:#fafafa;--radius:16px;--max:960px;
+  --ok:#16a34a;--ok-bg:#f0fdf4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg);
+  line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+h1,h2,h3{line-height:1.2;letter-spacing:-.02em}
+a{color:inherit}
+.eyebrow{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-inner{max-width:var(--max);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.logo{font-weight:800;font-size:1.05rem;letter-spacing:-.02em;text-decoration:none}
+.nav-links{display:flex;gap:22px;align-items:center}
+.nav-links a{font-size:.9rem;font-weight:500;color:var(--muted);text-decoration:none;transition:color .2s}
+.nav-links a:hover,.nav-links a.active{color:var(--fg)}
+.nav-links a.active{font-weight:700}
+.lang-toggle{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--fg)}
+.lang-toggle:hover{border-color:var(--accent);color:var(--accent)}
+@media(max-width:600px){.nav-links{gap:14px}.nav-links a{font-size:.82rem}}
+
+/* HERO */
+.hero{padding:80px 0 48px}
+.hero .eyebrow{display:block;margin-bottom:14px}
+.hero h1{font-size:clamp(2.1rem,6vw,3.4rem);font-weight:800;margin-bottom:18px}
+.hero .lead{font-size:1.15rem;color:var(--muted);max-width:620px}
+.hero-cta{margin-top:30px;display:flex;gap:12px;flex-wrap:wrap}
+
+/* PAGE HEAD (untuk halaman dalam) */
+.page-head{padding:56px 0 8px}
+.page-head h1{font-size:clamp(1.8rem,5vw,2.6rem);font-weight:800;margin:12px 0 14px}
+.page-head .lead{font-size:1.08rem;color:var(--muted);max-width:640px}
+
+/* BUTTONS */
+.btn{display:inline-block;padding:12px 22px;border-radius:999px;font-weight:600;font-size:.95rem;text-decoration:none;transition:transform .15s,box-shadow .2s,background .2s,border-color .2s;cursor:pointer;border:none;font-family:inherit}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 24px -8px var(--accent)}
+.btn-ghost{border:1px solid var(--line);color:var(--fg);background:#fff}
+.btn-ghost:hover{border-color:var(--fg)}
+
+/* SECTIONS */
+section{padding:48px 0}
+section.bordered{border-top:1px solid var(--line)}
+
+/* TAGS */
+.stack{display:flex;flex-wrap:wrap;gap:8px}
+.tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:.82rem;font-weight:500;color:#333}
+
+/* CARD GRID (explore, projects, dll) */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px;margin-top:26px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column;text-decoration:none;color:inherit;transition:transform .15s,border-color .2s}
+a.card:hover{transform:translateY(-4px);border-color:var(--accent)}
+.card .c-type{font-size:.78rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.card h3{font-size:1.2rem;margin:10px 0 10px}
+.card p{color:#444;font-size:.95rem;flex:1}
+.card .c-link{margin-top:16px;font-size:.9rem;font-weight:700;color:var(--accent)}
+
+/* BADGE */
+.badge{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:5px 11px;border-radius:999px;margin-bottom:14px}
+.badge.ok{background:var(--ok-bg);color:var(--ok)}
+.badge.soon{background:#f1f5f9;color:var(--muted)}
+.dot{width:7px;height:7px;border-radius:50%;background:currentColor}
+
+/* CONTACT LIST */
+.contact-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:26px}
+.contact-item{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;text-decoration:none;color:inherit;transition:border-color .2s,transform .15s}
+.contact-item:hover{border-color:var(--accent);transform:translateY(-2px)}
+.contact-item .ci-ico{width:42px;height:42px;border-radius:10px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex:none}
+.contact-item .ci-label{font-size:.78rem;color:var(--muted);font-weight:600}
+.contact-item .ci-value{font-size:.98rem;font-weight:700}
+
+/* FOOTER */
+footer{padding:40px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line);margin-top:20px}
+footer a{color:var(--accent);text-decoration:none;font-weight:600}
+
+/* LANG TOGGLE VISIBILITY */
+[data-en]{display:none}
+html[lang="en"] [data-id]{display:none}
+html[lang="en"] [data-en]{display:inline}
+html[lang="en"] p[data-en]{display:block}
