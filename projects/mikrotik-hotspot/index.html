@@ -3,158 +3,218 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MikroTik Hotspot Templates — Tessa</title>
-<meta name="description" content="Kumpulan template login page hotspot MikroTik open source dengan customizer bawaan. Perusahaan, Cafe, dan Voucher.">
+<title>MikroTik Hotspot Templates · Tessa</title>
+<meta name="description" content="Template login page hotspot MikroTik open source dengan customizer & demo. Perusahaan, Cafe, dan Voucher.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="../../assets/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" href="../../assets/favicon.png">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../../assets/style.css">
 <style>
-  :root{
-    --bg:#ffffff;--fg:#141414;--muted:#6b7280;--line:#e7e7e9;
-    --accent:#2563eb;--accent-soft:#eff4ff;--card:#fafafa;--radius:16px;--max:960px;
-    --ok:#16a34a;--ok-bg:#f0fdf4;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--fg);
-    line-height:1.6;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
-  h1,h2,h3{line-height:1.2;letter-spacing:-.02em}
-  a{color:inherit}
-  .eyebrow{font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
-
-  nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-  .nav-inner{max-width:var(--max);margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
-  .back{font-size:.9rem;font-weight:600;text-decoration:none;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
-  .back:hover{color:var(--fg)}
-  .lang-toggle{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:inherit;color:var(--fg)}
-  .lang-toggle:hover{border-color:var(--accent);color:var(--accent)}
-
-  header.hero{padding:64px 0 40px}
-  .hero h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:800;margin:14px 0 16px}
-  .hero .lead{font-size:1.1rem;color:var(--muted);max-width:640px}
-  .stack{margin-top:20px;display:flex;flex-wrap:wrap;gap:8px}
-  .tag{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 13px;font-size:.82rem;font-weight:500;color:#333}
-
-  section{padding:24px 0 72px}
-  .versions{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:22px;margin-top:8px}
-  .ver{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;display:flex;flex-direction:column}
-  .ver.available{border-color:#dbe6ff}
-  .badge{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-size:.72rem;font-weight:700;
-    text-transform:uppercase;letter-spacing:.05em;padding:5px 11px;border-radius:999px;margin-bottom:14px}
-  .badge.ok{background:var(--ok-bg);color:var(--ok)}
-  .badge.soon{background:#f1f5f9;color:var(--muted)}
-  .dot{width:7px;height:7px;border-radius:50%;background:currentColor}
-  .ver h3{font-size:1.25rem;margin-bottom:8px}
-  .ver p{color:#444;font-size:.95rem;flex:1}
-  .ver .who{margin-top:12px;font-size:.82rem;color:var(--muted)}
-  .ver .btns{margin-top:20px;display:flex;flex-wrap:wrap;gap:10px}
-  .btn{display:inline-block;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.9rem;text-decoration:none;transition:.15s}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-primary:hover{background:#1d4ed8}
-  .btn-ghost{border:1px solid var(--line);color:var(--fg)}
-  .btn-ghost:hover{border-color:var(--fg)}
-  .btn.disabled{background:#f1f5f9;color:#9ca3af;cursor:not-allowed;pointer-events:none}
-
-  .info{background:var(--accent-soft);border:1px solid #dbe6ff;border-radius:14px;padding:18px 22px;margin-top:36px;font-size:.9rem;color:#1e3a8a}
-  .info strong{font-weight:700}
-
-  footer{padding:34px 0;text-align:center;color:var(--muted);font-size:.85rem;border-top:1px solid var(--line)}
-  footer a{color:var(--accent);text-decoration:none;font-weight:600}
-
-  [data-en]{display:none}
-  html[lang="en"] [data-id]{display:none}
-  html[lang="en"] [data-en]{display:inline}
+  .prose{max-width:700px}
+  .prose h2{font-size:1.5rem;margin:8px 0 12px}
+  .prose p{color:#3d545f;font-size:1.04rem;margin-top:12px}
+  .prose p strong{color:var(--fg)}
+  .lead-list{margin-top:16px;display:grid;gap:10px;max-width:700px}
+  .lead-list li{list-style:none;display:flex;gap:10px;color:#3d545f;font-size:.98rem}
+  .lead-list li::before{content:"▹";color:var(--accent);font-weight:700}
+  /* demo */
+  .demo-frame{width:100%;max-width:920px;margin:26px auto 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:#fff}
+  .demo-frame .bar{height:38px;background:var(--panel-2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 14px}
+  .demo-frame .bar i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#d0dfe4}
+  .demo-frame .bar .url{margin-left:10px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+  .demo-frame iframe{width:100%;height:540px;border:0;display:block;background:#fff}
+  .demo-actions{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+  .demo-toggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-top:18px}
+  .demo-toggle button{border:none;background:transparent;font-family:var(--mono);font-weight:600;font-size:.8rem;padding:7px 15px;border-radius:7px;cursor:pointer;color:var(--muted);transition:.15s}
+  .demo-toggle button.active{background:var(--accent-bright);color:#052430}
+  .demo-frame.mobile{max-width:400px}
+  .demo-frame.mobile iframe{height:600px}
+  /* version cards keep buttons */
+  .ver-btns{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px}
+  .who{margin-top:12px;font-size:.84rem;color:var(--muted);font-family:var(--mono)}
+  .btn.disabled{background:var(--panel-2);color:var(--muted);cursor:not-allowed;pointer-events:none;border:1px solid var(--line);box-shadow:none}
+  /* intro two-column with phone mockup */
+  .intro-grid{display:grid;grid-template-columns:minmax(200px,240px) 1fr;gap:46px;align-items:center}
+  .phone-mock{position:relative;width:100%;max-width:240px;aspect-ratio:2166/4325;margin:0 auto;filter:drop-shadow(0 24px 44px rgba(19,44,56,.28))}
+  .phone-mock .screen{position:absolute;left:6.74%;top:2.66%;width:87.21%;height:94.63%;overflow:hidden;background:#0a1018;z-index:1}
+  .phone-mock .screen iframe{width:100%;height:100%;border:0;display:block}
+  .phone-mock .frame{position:absolute;inset:0;width:100%;height:100%;z-index:2;pointer-events:none}
+  @media(max-width:760px){.intro-grid{grid-template-columns:1fr;gap:30px}.intro-grid .prose{order:-1}}
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-inner">
-    <a class="back" href="../index.html">← <span data-id>Kembali ke Projects</span><span data-en>Back to Projects</span></a>
-    <button class="lang-toggle" onclick="toggleLang()"><span data-id>EN</span><span data-en>ID</span></button>
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html" class="active">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../contact/index.html">Contact</a>
+      <button class="lang-toggle" onclick="toggleLang()"><span data-id>EN</span><span data-en>ID</span></button>
+    </div>
   </div>
 </nav>
 
-<header class="hero">
+<!-- HERO -->
+<header class="page-head">
   <div class="wrap">
     <span class="eyebrow"><span data-id>Proyek Open Source</span><span data-en>Open Source Project</span></span>
     <h1>MikroTik Hotspot Templates</h1>
     <p class="lead">
-      <span data-id>Kumpulan template login page (captive portal) hotspot MikroTik yang bersih, responsive, dan ringan — plus <strong>customizer bawaan</strong> biar siapa pun bisa atur warna, font, logo, dan teks tanpa ngoprek kode, lalu download versinya sendiri.</span>
-      <span data-en>A collection of clean, responsive, lightweight MikroTik hotspot login (captive portal) templates — with a <strong>built-in customizer</strong> so anyone can set colors, fonts, logo, and text without touching code, then download their own version.</span>
+      <span data-id>Template login page (captive portal) hotspot MikroTik yang bersih, responsive, dan ringan, plus customizer no-code biar siapa pun bisa bikin versinya sendiri.</span>
+      <span data-en>Clean, responsive, lightweight MikroTik hotspot login (captive portal) templates, plus a no-code customizer so anyone can make their own version.</span>
     </p>
-    <div class="stack">
+    <div class="stack" style="margin-top:20px">
       <span class="tag">HTML/CSS</span><span class="tag">MikroTik</span><span class="tag">Captive Portal</span>
       <span class="tag">Offline-safe</span><span class="tag">No dependencies</span>
     </div>
   </div>
 </header>
 
-<section>
+<!-- INTRO -->
+<section class="bordered">
+  <div class="wrap intro-grid">
+    <div class="phone-mock">
+      <div class="screen"><iframe src="perusahaan/demo.html" title="Demo mobile" loading="lazy"></iframe></div>
+      <img class="frame" src="../../assets/phone-frame.png" alt="Mockup HP menampilkan halaman login">
+    </div>
+    <div class="prose">
+      <span class="eyebrow"><span data-id>Perkenalan</span><span data-en>Intro</span></span>
+      <h2 style="margin-top:12px"><span data-id>Apa itu login page hotspot?</span><span data-en>What is a hotspot login page?</span></h2>
+      <p data-id>Login page hotspot adalah halaman yang muncul otomatis pas kamu nyambung ke WiFi publik, sebelum dapat akses internet. Di situ kamu masukin username/password atau kode voucher. Di MikroTik, halaman ini bisa diganti sepenuhnya sesuai kebutuhan.</p>
+      <p data-en>A hotspot login page is the page that pops up automatically when you connect to public WiFi, before you get internet access. That's where you enter a username/password or a voucher code. On MikroTik, this page can be fully replaced to fit your needs.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="bordered">
   <div class="wrap">
-    <span class="eyebrow"><span data-id>Pilih Versi</span><span data-en>Choose a Version</span></span>
-    <div class="versions">
+    <span class="eyebrow"><span data-id>Demo Langsung</span><span data-en>Live Demo</span></span>
+    <h2 style="font-size:1.5rem;margin:10px 0 6px;color:var(--fg)"><span data-id>Lihat versi Perusahaan</span><span data-en>See the Corporate version</span></h2>
+    <p style="color:#3d545f;max-width:640px"><span data-id>Ini tampilan asli halaman login-nya (data contoh). Coba klik tab Karyawan/Tamu, dan ganti Desktop/Mobile.</span><span data-en>This is the actual login page (sample data). Try the Employee/Guest tabs, and switch Desktop/Mobile.</span></p>
 
-      <!-- V1 Perusahaan -->
-      <div class="ver available">
-        <span class="badge ok"><span class="dot"></span> <span data-id>Tersedia</span><span data-en>Available</span></span>
-        <h3><span data-id>Perusahaan</span><span data-en>Corporate</span></h3>
-        <p data-id>Login bertab: Karyawan/Intern (username + password) & Tamu (kode akses). Set lengkap: login, status, logout, alogin, error — plus dukungan CHAP.</p>
-        <p data-en>Tabbed login: Employee/Intern (username + password) & Guest (access code). Full set: login, status, logout, alogin, error — plus CHAP support.</p>
-        <div class="who"><span data-id>👤 Untuk: karyawan, intern, tamu</span><span data-en>👤 For: employees, interns, guests</span></div>
-        <div class="btns">
-          <a class="btn btn-primary" href="perusahaan/customizer.html"><span data-id>Buka Customizer</span><span data-en>Open Customizer</span></a>
-          <a class="btn btn-ghost" href="perusahaan/login.html" target="_blank"><span data-id>Preview</span><span data-en>Preview</span></a>
-        </div>
-      </div>
-
-      <!-- V2 Cafe -->
-      <div class="ver">
-        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
-        <h3><span data-id>Cafe / Resto / Hotel</span><span data-en>Cafe / Resto / Hotel</span></h3>
-        <p data-id>Fokus tamu: input voucher dari struk/kasir + info durasi paket. Gaya hangat/elegan, welcome message, tombol WhatsApp, banner promo.</p>
-        <p data-en>Guest-focused: voucher input from receipt/cashier + package duration info. Warm/elegant style, welcome message, WhatsApp button, promo banner.</p>
-        <div class="who"><span data-id>☕ Untuk: pelanggan / tamu</span><span data-en>☕ For: customers / guests</span></div>
-        <div class="btns">
-          <span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span>
-        </div>
-      </div>
-
-      <!-- V3 Voucher -->
-      <div class="ver">
-        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
-        <h3><span data-id>Publik / Voucher</span><span data-en>Public / Voucher</span></h3>
-        <p data-id>Fokus konversi: input kode voucher menonjol + tombol "Beli Voucher" (WhatsApp), daftar harga paket, info masa aktif, FAQ singkat.</p>
-        <p data-en>Conversion-focused: prominent voucher input + "Buy Voucher" button (WhatsApp), package price list, validity info, short FAQ.</p>
-        <div class="who"><span data-id>🎫 Untuk: penjualan voucher umum</span><span data-en>🎫 For: public voucher sales</span></div>
-        <div class="btns">
-          <span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span>
-        </div>
-      </div>
-
+    <div class="demo-toggle">
+      <button id="demoDesktop" class="active" onclick="setDemo('desktop')">🖥️ Desktop</button>
+      <button id="demoMobile" onclick="setDemo('mobile')">📱 Mobile</button>
     </div>
 
-    <div class="info">
-      <span data-id>💡 <strong>Cara pakai:</strong> buka Customizer → atur nama, warna, font, logo → lihat preview langsung → download <strong>login.html</strong> atau <strong>template lengkap (.zip)</strong> → upload ke folder hotspot MikroTik. Semua hasil download offline-safe (tanpa aset eksternal).</span>
-      <span data-en>💡 <strong>How to use:</strong> open the Customizer → set name, color, font, logo → see the live preview → download <strong>login.html</strong> or the <strong>full template (.zip)</strong> → upload to the MikroTik hotspot folder. Every download is offline-safe (no external assets).</span>
+    <div class="demo-frame" id="demoFrame">
+      <div class="bar"><i></i><i></i><i></i><span class="url">demo · hotspot login</span></div>
+      <iframe src="perusahaan/demo.html" title="Demo MikroTik Hotspot Login" loading="lazy"></iframe>
+    </div>
+
+    <div class="demo-actions">
+      <a class="btn btn-primary" href="perusahaan/customizer.html"><span data-id>Buka Customizer</span><span data-en>Open Customizer</span></a>
+      <a class="btn btn-ghost" href="perusahaan/demo.html" target="_blank"><span data-id>Demo Fullscreen</span><span data-en>Fullscreen Demo</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- WHY DESIGN MATTERS -->
+<section class="bordered">
+  <div class="wrap prose">
+    <span class="eyebrow"><span data-id>Kenapa penting</span><span data-en>Why it matters</span></span>
+    <h2 style="margin-top:12px"><span data-id>Kenapa desainnya penting?</span><span data-en>Why the design matters</span></h2>
+    <p data-id>Ini halaman pertama yang dilihat setiap orang yang nyambung, jadi ngaruh ke kesan dan kemudahan. Tampilan default MikroTik jadul dan bikin bingung. Yang bagus itu:</p>
+    <p data-en>It's the first page everyone who connects sees, so it shapes the impression and the ease of use. MikroTik's default look is dated and confusing. A good one is:</p>
+    <ul class="lead-list">
+      <li><span data-id><strong>Memperkuat brand</strong> tempat/usaha.</span><span data-en><strong>Reinforces the brand</strong> of the place/business.</span></li>
+      <li><span data-id><strong>Gampang dipakai</strong> di HP (mayoritas pengguna hotspot).</span><span data-en><strong>Easy to use</strong> on phones (most hotspot users).</span></li>
+      <li><span data-id><strong>Ringan &amp; cepat</strong> walau koneksi terbatas.</span><span data-en><strong>Light &amp; fast</strong> even on limited connections.</span></li>
+      <li><span data-id><strong>Tombol login jelas</strong>, nggak bikin nyasar.</span><span data-en><strong>Clear login button</strong>, no confusion.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="bordered">
+  <div class="wrap">
+    <span class="eyebrow"><span data-id>Fitur</span><span data-en>Features</span></span>
+    <div class="grid">
+      <div class="card">
+        <span class="c-type"><span data-id>Ringan</span><span data-en>Lightweight</span></span>
+        <h3><span data-id>Offline-safe</span><span data-en>Offline-safe</span></h3>
+        <p data-id>Tanpa aset eksternal (font/CDN). Selalu tampil sempurna walau captive portal muncul sebelum ada internet.</p>
+        <p data-en>No external assets (fonts/CDN). Always renders perfectly even though the captive portal loads before internet.</p>
+      </div>
+      <div class="card">
+        <span class="c-type"><span data-id>No-code</span><span data-en>No-code</span></span>
+        <h3>Customizer</h3>
+        <p data-id>Atur nama, warna, font, logo, background &amp; teks lewat preview langsung, lalu download versimu. Tanpa ngoprek kode.</p>
+        <p data-en>Set name, colors, font, logo, background &amp; text with a live preview, then download your version. No code needed.</p>
+      </div>
+      <div class="card">
+        <span class="c-type"><span data-id>Lengkap</span><span data-en>Complete</span></span>
+        <h3><span data-id>Set halaman penuh</span><span data-en>Full page set</span></h3>
+        <p data-id>Bukan cuma login: ada status, logout, alogin, error, errors.txt, dan md5.js (dukungan CHAP). Siap produksi.</p>
+        <p data-en>Not just login: status, logout, alogin, error, errors.txt, and md5.js (CHAP support). Production-ready.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VERSIONS -->
+<section class="bordered">
+  <div class="wrap">
+    <span class="eyebrow"><span data-id>Pilih Versi</span><span data-en>Choose a Version</span></span>
+    <div class="grid">
+
+      <div class="card">
+        <span class="badge ok"><span class="dot"></span> <span data-id>Tersedia</span><span data-en>Available</span></span>
+        <span class="c-type"><span data-id>Perusahaan</span><span data-en>Corporate</span></span>
+        <h3><span data-id>Perusahaan</span><span data-en>Corporate</span></h3>
+        <p data-id>Login bertab: Karyawan/Intern (username + password) &amp; Tamu (kode akses). Set lengkap + dukungan CHAP.</p>
+        <p data-en>Tabbed login: Employee/Intern (username + password) &amp; Guest (access code). Full set + CHAP support.</p>
+        <div class="who"><span data-id>👤 karyawan, intern, tamu</span><span data-en>👤 employees, interns, guests</span></div>
+        <div class="ver-btns">
+          <a class="btn btn-primary" href="perusahaan/customizer.html"><span data-id>Customizer</span><span data-en>Customizer</span></a>
+          <a class="btn btn-ghost" href="perusahaan/demo.html" target="_blank">Demo</a>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
+        <span class="c-type"><span data-id>Cafe / Resto / Hotel</span><span data-en>Cafe / Resto / Hotel</span></span>
+        <h3>Cafe / Resto / Hotel</h3>
+        <p data-id>Fokus tamu: input voucher + info durasi paket. Gaya hangat, welcome message, tombol WhatsApp, banner promo.</p>
+        <p data-en>Guest-focused: voucher input + package duration. Warm style, welcome message, WhatsApp button, promo banner.</p>
+        <div class="who"><span data-id>☕ pelanggan / tamu</span><span data-en>☕ customers / guests</span></div>
+        <div class="ver-btns"><span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span></div>
+      </div>
+
+      <div class="card">
+        <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
+        <span class="c-type"><span data-id>Publik / Voucher</span><span data-en>Public / Voucher</span></span>
+        <h3><span data-id>Publik / Voucher</span><span data-en>Public / Voucher</span></h3>
+        <p data-id>Fokus konversi: input voucher menonjol + tombol "Beli Voucher" (WhatsApp), daftar harga, info masa aktif, FAQ.</p>
+        <p data-en>Conversion-focused: prominent voucher input + "Buy Voucher" button (WhatsApp), price list, validity info, FAQ.</p>
+        <div class="who"><span data-id>🎫 penjualan voucher umum</span><span data-en>🎫 public voucher sales</span></div>
+        <div class="ver-btns"><span class="btn disabled"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span></div>
+      </div>
+
     </div>
   </div>
 </section>
 
 <footer>
-  <span data-id>Dibuat oleh Tessa</span><span data-en>Built by Tessa</span> ·
+  © <span id="year"></span> Tessa ·
   <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> ·
   <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
 </footer>
 
+<script src="../../assets/site.js"></script>
 <script>
-  function toggleLang(){
-    var html=document.documentElement;
-    html.setAttribute('lang', html.getAttribute('lang')==='id' ? 'en' : 'id');
+  function setDemo(m){
+    var f=document.getElementById('demoFrame');
+    f.classList.toggle('mobile', m==='mobile');
+    document.getElementById('demoDesktop').classList.toggle('active', m==='desktop');
+    document.getElementById('demoMobile').classList.toggle('active', m==='mobile');
   }
 </script>
 </body>
