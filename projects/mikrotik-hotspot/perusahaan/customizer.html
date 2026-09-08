@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Customizer — Template Hotspot MikroTik (V1 Perusahaan)</title>
+<link rel="icon" href="../../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{--ink:#0f172a;--muted:#64748b;--line:#e2e8f0;--accent:#2563eb;--bg:#f1f5f9}
@@ -58,9 +61,31 @@
   iframe{border:1px solid var(--line);border-radius:14px;background:#fff;box-shadow:0 10px 40px -18px rgba(0,0,0,.35);
     width:100%;height:640px;transition:width .2s}
   iframe.mobile{width:390px}
+  /* site header/footer (biar konsisten dengan situs) */
+  .site-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .site-nav-inner{max-width:1240px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .site-logo{font-weight:800;font-size:1.05rem;color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;gap:9px;letter-spacing:.02em}
+  .site-logo::before{content:"";width:11px;height:11px;border-radius:50%;background:#39c6ee;box-shadow:0 0 12px 2px rgba(57,198,238,.85)}
+  .site-links{display:flex;gap:20px;flex-wrap:wrap}
+  .site-links a{font-family:ui-monospace,'JetBrains Mono',Menlo,monospace;font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none}
+  .site-links a:hover{color:var(--ink)}
+  .site-footer{padding:26px 24px;text-align:center;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);font-family:ui-monospace,'JetBrains Mono',Menlo,monospace}
+  .site-footer a{color:#0e8fca;text-decoration:none;font-weight:600}
 </style>
 </head>
 <body>
+<nav class="site-nav">
+  <div class="site-nav-inner">
+    <a class="site-logo" href="../../../index.html">Tessa</a>
+    <div class="site-links">
+      <a href="../index.html">← Proyek</a>
+      <a href="../../../index.html">Home</a>
+      <a href="../../index.html">Projects</a>
+      <a href="../../../content/index.html">Content</a>
+      <a href="../../../contact/index.html">Contact</a>
+    </div>
+  </div>
+</nav>
 <header>
   <h1>🎨 Customizer — Template Hotspot MikroTik</h1>
   <p>V1 Perusahaan · Atur tampilan, lihat preview langsung, lalu download versi kamu.</p>
@@ -158,6 +183,8 @@
     </div>
   </div>
 </div>
+
+<footer class="site-footer">© <span id="siteYear">2026</span> Tessa · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
 
 <script>
 /* ===== Template login.html asli (di-embed untuk preview & download) ===== */

@@ -31,10 +31,10 @@
 <header class="page-head">
   <div class="wrap">
     <span class="eyebrow"><span data-id>Terhubung</span><span data-en>Connect</span></span>
-    <h1><span data-id>Mari terhubung</span><span data-en>Let's connect</span></h1>
+    <h1><span data-id>Kontak saya</span><span data-en>Contact me</span></h1>
     <p class="lead">
-      <span data-id>Terbuka untuk kolaborasi, pertanyaan soal proyekku, atau sekadar ngobrol soal tech.</span>
-      <span data-en>Open to collaboration, questions about my projects, or just chatting about tech.</span>
+      <span data-id>Terbuka untuk kolaborasi, Endorsement, atau hanya untuk terhubung.</span>
+      <span data-en>Open to collaboration, endorsements, or simply connecting.</span>
     </p>
   </div>
 </header>
@@ -42,13 +42,13 @@
 <section>
   <div class="wrap">
     <div class="contact-list">
-      <a class="contact-item" href="mailto:fesalsalmansb@gmail.com">
+      <button class="contact-item" type="button" onclick="copyEmail(this)" style="font:inherit;cursor:pointer;text-align:left;width:100%">
         <div class="ci-ico">✉️</div>
         <div>
           <div class="ci-label">Email</div>
-          <div class="ci-value">fesalsalmansb@gmail.com</div>
+          <div class="ci-value"><span data-id>Klik untuk copy email saya</span><span data-en>Click to copy my email</span></div>
         </div>
-      </a>
+      </button>
       <a class="contact-item" href="https://instagram.com/arschbx" target="_blank" rel="noopener">
         <div class="ci-ico">📸</div>
         <div>
@@ -63,18 +63,21 @@
           <div class="ci-value">Tessa-stuck</div>
         </div>
       </a>
-      <a class="contact-item" href="#" target="_blank" rel="noopener">
+      <a class="contact-item" href="https://tiktok.com/@arschbx" target="_blank" rel="noopener">
         <div class="ci-ico">🎵</div>
         <div>
           <div class="ci-label">TikTok</div>
-          <div class="ci-value"><span data-id>[isi handle]</span><span data-en>[add handle]</span></div>
+          <div class="ci-value">@arschbx</div>
+        </div>
+      </a>
+      <a class="contact-item" href="https://youtube.com/@arschbx" target="_blank" rel="noopener">
+        <div class="ci-ico">▶️</div>
+        <div>
+          <div class="ci-label">YouTube</div>
+          <div class="ci-value">@arschbx</div>
         </div>
       </a>
     </div>
-    <p style="margin-top:22px;font-size:.85rem;color:var(--muted)">
-      <span data-id>✏️ Ganti handle TikTok (dan yang lain kalau perlu) dengan akun aslimu.</span>
-      <span data-en>✏️ Replace the TikTok handle (and others if needed) with your real accounts.</span>
-    </p>
   </div>
 </section>
 
@@ -85,5 +88,25 @@
 </footer>
 
 <script src="../assets/site.js"></script>
+<script>
+  function copyEmail(btn){
+    var email='fesalsalmansb@gmail.com';
+    var val=btn.querySelector('.ci-value');
+    var done=function(){
+      var prev=val.innerHTML;
+      val.textContent='✓ Tersalin ke clipboard';
+      setTimeout(function(){ val.innerHTML=prev; }, 1800);
+    };
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(email).then(done, function(){fallback(email);done();});
+    } else { fallback(email); done(); }
+  }
+  function fallback(text){
+    var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try{ document.execCommand('copy'); }catch(e){}
+    document.body.removeChild(ta);
+  }
+</script>
 </body>
 </html>
