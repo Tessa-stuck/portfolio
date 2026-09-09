@@ -60,6 +60,11 @@
   .vbody h3{font-size:1.35rem;margin:10px 0 12px;color:var(--fg)}
   .vlink{font-family:var(--mono);font-weight:700;color:var(--accent);text-decoration:none;font-size:.9rem}
   .vlink.muted{color:var(--muted)}
+  /* fitur = teks biasa, tanpa kotak */
+  .feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:30px 40px;margin-top:24px}
+  .feat .c-type{font-family:var(--mono);font-size:.72rem;font-weight:600;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}
+  .feat h3{font-size:1.12rem;color:var(--fg);margin:8px 0 8px}
+  .feat p{color:#3d545f;font-size:.96rem}
 </style>
 </head>
 <body>
@@ -199,28 +204,31 @@
         </div>
       </a>
 
-      <div class="vcard">
+      <a class="vcard" href="demo-voucher.html">
         <div class="vtop">
           <div class="vfeat">
             <span class="vnum">#03</span>
             <div class="vftitle">FITUR</div>
             <ul>
-              <li><span data-id>Input Voucher</span><span data-en>Voucher input</span></li>
+              <li><span data-id>Login Voucher</span><span data-en>Voucher login</span></li>
+              <li><span data-id>Login Member</span><span data-en>Member login</span></li>
+              <li><span data-id>Tab Harga + Durasi</span><span data-en>Price + duration tab</span></li>
+              <li><span data-id>Carousel 3 Gambar</span><span data-en>3-image carousel</span></li>
               <li><span data-id>Tombol Beli (WA)</span><span data-en>Buy button (WA)</span></li>
-              <li><span data-id>Daftar Harga</span><span data-en>Price list</span></li>
-              <li><span data-id>Info Masa Aktif</span><span data-en>Validity info</span></li>
-              <li>FAQ</li>
               <li>Customizer</li>
             </ul>
           </div>
-          <div class="vphold"><span data-id>Segera</span><span data-en>Soon</span></div>
+          <div class="vphone">
+            <div class="vpscreen"><iframe src="voucher/demo.html" title="Preview" loading="lazy" tabindex="-1"></iframe></div>
+            <img class="frame" src="../../assets/phone-frame.png" alt="">
+          </div>
         </div>
         <div class="vbody">
-          <span class="badge soon"><span data-id>Segera</span><span data-en>Soon</span></span>
+          <span class="badge ok"><span class="dot"></span> <span data-id>Tersedia</span><span data-en>Available</span></span>
           <h3><span data-id>Publik / Voucher</span><span data-en>Public / Voucher</span></h3>
-          <span class="vlink muted"><span data-id>Segera hadir</span><span data-en>Coming soon</span></span>
+          <span class="vlink"><span data-id>Lihat template →</span><span data-en>View template →</span></span>
         </div>
-      </div>
+      </a>
 
     </div>
   </div>
@@ -230,20 +238,20 @@
 <section class="bordered">
   <div class="wrap">
     <span class="eyebrow"><span data-id>Fitur</span><span data-en>Features</span></span>
-    <div class="grid">
-      <div class="card">
+    <div class="feat-grid">
+      <div class="feat">
         <span class="c-type"><span data-id>Ringan</span><span data-en>Lightweight</span></span>
         <h3><span data-id>Offline-safe</span><span data-en>Offline-safe</span></h3>
         <p data-id>Tanpa aset eksternal (font/CDN). Selalu tampil sempurna walau captive portal muncul sebelum ada internet.</p>
         <p data-en>No external assets (fonts/CDN). Always renders perfectly even though the captive portal loads before internet.</p>
       </div>
-      <div class="card">
+      <div class="feat">
         <span class="c-type"><span data-id>No-code</span><span data-en>No-code</span></span>
         <h3>Customizer</h3>
         <p data-id>Atur nama, warna, font, logo, background &amp; teks lewat preview langsung, lalu download versimu. Tanpa ngoprek kode.</p>
         <p data-en>Set name, colors, font, logo, background &amp; text with a live preview, then download your version. No code needed.</p>
       </div>
-      <div class="card">
+      <div class="feat">
         <span class="c-type"><span data-id>Lengkap</span><span data-en>Complete</span></span>
         <h3><span data-id>Set halaman penuh</span><span data-en>Full page set</span></h3>
         <p data-id>Bukan cuma login: ada status, logout, alogin, error, errors.txt, dan md5.js (dukungan CHAP). Siap produksi.</p>

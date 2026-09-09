@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>$(hostname) — Terjadi Kesalahan</title>
+<style>
+  :root{--brand:#5457e6;--brand-dark:#3a3ccc;--bg:#eef0fb;--card:#fff;--fg:#191a2e;--muted:#6b7280;--line:#e6e8f2;--danger:#c0392b;--danger-bg:#fbeeec}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--fg);min-height:100vh;
+    display:grid;place-items:center;padding:24px;
+    background:radial-gradient(680px 500px at 8% 6%,rgba(84,87,230,.16),transparent 60%),radial-gradient(640px 480px at 96% 100%,rgba(139,123,232,.16),transparent 60%),var(--bg)}
+  .card{width:min(400px,100%);background:var(--card);border-radius:24px;padding:38px 30px;box-shadow:0 34px 64px -30px rgba(30,25,80,.45);text-align:center}
+  .icon{width:70px;height:70px;border-radius:50%;background:var(--danger-bg);margin:0 auto 20px;display:flex;align-items:center;justify-content:center}
+  .icon svg{width:36px;height:36px;stroke:var(--danger);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+  h2{font-size:1.4rem;font-weight:800}
+  .msg{background:var(--danger-bg);border:1px solid #f0cdc7;color:var(--danger);padding:12px 16px;border-radius:12px;font-size:.92rem;font-weight:600;margin:18px 0}
+  p{color:var(--muted);font-size:.92rem}
+  .btn{display:block;text-decoration:none;padding:14px;border-radius:14px;background:var(--brand);color:#fff;font-weight:800;margin-top:22px}
+  .btn:hover{background:var(--brand-dark)}
+  .credit{margin-top:18px;font-size:.74rem;color:#aeb2c8}.credit a{color:var(--brand);text-decoration:none;font-weight:700}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon"><svg viewBox="0 0 24 24"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+    <h2>Terjadi Kesalahan</h2>
+    <div class="msg">$(error)</div>
+    <p>Silakan coba lagi. Kalau kode voucher salah/kadaluarsa, hubungi admin.</p>
+    <a class="btn" href="$(link-login)">Kembali ke Login</a>
+    <div class="credit">Template oleh <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></div>
+  </div>
+</body>
+</html>
