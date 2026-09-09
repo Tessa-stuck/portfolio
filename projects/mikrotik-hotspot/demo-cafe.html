@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo · Cafe · MikroTik Hotspot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<link rel="stylesheet" href="../../assets/style.css">
+<style>
+  .demo-toggle{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:4px;margin-top:8px}
+  .demo-toggle button{border:none;background:transparent;font-family:var(--mono);font-weight:600;font-size:.82rem;padding:8px 18px;border-radius:7px;cursor:pointer;color:var(--muted);transition:.15s}
+  .demo-toggle button.active{background:var(--accent-bright);color:#052430}
+  .demo-frame{width:100%;max-width:960px;margin:22px auto 0;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);background:#fff;transition:max-width .2s}
+  .demo-frame .bar{height:38px;background:var(--panel-2);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 14px}
+  .demo-frame .bar i{width:11px;height:11px;border-radius:50%;display:inline-block;background:#d0dfe4}
+  .demo-frame .bar .url{margin-left:10px;font-family:var(--mono);font-size:.74rem;color:var(--muted)}
+  .demo-viewport{position:relative;width:100%;height:560px;overflow:hidden;background:#0a1018}
+  .demo-frame.mobile{max-width:420px}
+  .demo-frame.mobile .demo-viewport{height:660px}
+  .demo-frame iframe{position:absolute;top:0;left:0;border:0;display:block;background:#fff;transform-origin:top left}
+  .demo-actions{margin-top:22px;display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../contact/index.html">Contact</a>
+      <button class="lang-toggle" onclick="toggleLang()"><span data-id>EN</span><span data-en>ID</span></button>
+    </div>
+  </div>
+</nav>
+
+<header class="page-head">
+  <div class="wrap">
+    <a href="index.html" style="font-family:var(--mono);font-size:.8rem;color:var(--muted);text-decoration:none">← <span data-id>Kembali ke Proyek</span><span data-en>Back to Project</span></a>
+    <span class="eyebrow" style="display:block;margin-top:14px"><span data-id>Demo · Cafe</span><span data-en>Demo · Cafe / Resto / Hotel</span></span>
+    <h1 style="font-size:clamp(1.7rem,4.5vw,2.4rem);margin:12px 0 12px">MikroTik Hotspot Login</h1>
+    <p class="lead"><span data-id>Tampilan asli halaman login (data contoh). Coba tab Karyawan/Tamu, dan ganti tampilan Desktop/Mobile.</span><span data-en>The actual login page (sample data). Try the Employee/Guest tabs, and switch Desktop/Mobile.</span></p>
+  </div>
+</header>
+
+<section style="padding-top:6px">
+  <div class="wrap" style="text-align:center">
+    <div class="demo-toggle">
+      <button id="demoDesktop" class="active" onclick="setDemo('desktop')">🖥️ Desktop</button>
+      <button id="demoMobile" onclick="setDemo('mobile')">📱 Mobile</button>
+    </div>
+
+    <div class="demo-frame" id="demoFrame">
+      <div class="bar"><i></i><i></i><i></i><span class="url">demo · hotspot login</span></div>
+      <div class="demo-viewport"><iframe id="demoIframe" src="cafe/demo.html" title="Demo MikroTik Hotspot Login"></iframe></div>
+    </div>
+
+    <div class="demo-actions">
+      <a class="btn btn-primary" href="cafe/customizer.html"><span data-id>Edit Template</span><span data-en>Edit Template</span></a>
+      <a class="btn btn-ghost" href="index.html#versi"><span data-id>Pilih Template Lain</span><span data-en>Other Templates</span></a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  © <span id="year"></span> Tessa ·
+  <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> ·
+  <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
+</footer>
+
+<script src="../../assets/site.js"></script>
+<script>
+  function fitDemo(){
+    var frame=document.getElementById('demoFrame');
+    var vp=frame.querySelector('.demo-viewport');
+    var f=document.getElementById('demoIframe');
+    if(!vp||!f) return;
+    f.style.left='0';
+    if(frame.classList.contains('mobile')){
+      // Mobile: iframe isi penuh frame sempit (frame-nya yang dikecilin & ketengah)
+      f.style.width='100%';
+      f.style.height=vp.clientHeight+'px';
+      f.style.transform='none';
+    } else {
+      // Desktop: render lebar desktop asli lalu scale-down biar pas
+      var dw=1180;
+      var s=vp.clientWidth/dw;
+      f.style.width=dw+'px';
+      f.style.height=(vp.clientHeight/s)+'px';
+      f.style.transform='scale('+s+')';
+    }
+  }
+  function setDemo(m){
+    var frame=document.getElementById('demoFrame');
+    frame.classList.toggle('mobile', m==='mobile');
+    document.getElementById('demoDesktop').classList.toggle('active', m==='desktop');
+    document.getElementById('demoMobile').classList.toggle('active', m==='mobile');
+    fitDemo();
+  }
+  window.addEventListener('resize', fitDemo);
+  window.addEventListener('load', fitDemo);
+  document.addEventListener('DOMContentLoaded', fitDemo);
+</script>
+</body>
+</html>

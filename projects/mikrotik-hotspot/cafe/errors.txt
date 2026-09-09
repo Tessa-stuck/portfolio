@@ -1,0 +1,35 @@
+# Pesan error yang ditampilkan ke pengguna saat login http/https.
+# Key di sebelah kiri WAJIB sama persis dengan standar MikroTik.
+# Teks di sebelah kanan boleh diubah / diterjemahkan.
+# Variabel yang bisa dipakai: $(error-orig), $(ip), $(username)
+
+internal-error = terjadi kesalahan internal ($(error-orig))
+
+config-error = kesalahan konfigurasi ($(error-orig))
+
+not-logged-in = Anda belum masuk (ip $(ip))
+
+ippool-empty = tidak bisa memberikan alamat IP - pool alamat sudah penuh
+
+shutting-down = layanan hotspot sedang dimatikan
+
+user-session-limit = akun $(username) sudah mencapai batas sesi bersamaan
+
+license-session-limit = batas jumlah pengguna tercapai ($(error-orig))
+
+wrong-mac-username = username tidak valid ($(username)): MAC address ini bukan milik Anda
+
+chap-missing = browser tidak mengirim respons keamanan (coba lagi & aktifkan JavaScript)
+
+invalid-username = username atau password salah
+
+invalid-mac = akun $(username) tidak diizinkan masuk dari perangkat (MAC) ini
+
+uptime-limit = akun $(username) sudah mencapai batas waktu pemakaian
+traffic-limit = akun $(username) sudah mencapai batas kuota
+
+radius-timeout = server RADIUS tidak merespons
+
+auth-in-progress = proses login sedang berjalan, coba lagi sebentar
+
+radius-reply = $(error-orig)
