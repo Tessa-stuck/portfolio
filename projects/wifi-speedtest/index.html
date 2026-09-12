@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WiFi Speed Test — Tessa</title>
+<meta name="description" content="Tes kecepatan WiFi: download, upload, ping, jitter + rating browsing, gaming, streaming, video call. Bagian dari WFC Place.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#eef4f6;--card:#fff;--fg:#132c38;--muted:#5a7280;--line:#d0dfe4;
+    --accent:#0e8fca;--accent-bright:#39c6ee;--cyan:#0fa9b6;--field:#f4f7f8;--ok:#12a150;--warn:#d98a24;--bad:#df4a41;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--display:'Space Grotesk','Inter',sans-serif;
+    --shadow:0 10px 30px -16px rgba(19,44,56,.28);--glow:0 8px 26px -12px rgba(14,143,202,.5),0 0 0 1px rgba(57,198,238,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--fg);min-height:100vh;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(1100px 620px at 90% -10%,rgba(57,198,238,.20),transparent 60%),radial-gradient(900px 640px at 6% 8%,rgba(15,169,182,.16),transparent 55%),var(--bg);background-attachment:fixed}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(14,143,202,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(14,143,202,.06) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(circle at 50% 18%,#000 30%,transparent 92%)}
+  .wrap{max-width:760px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+  h1,h2{font-family:var(--display);letter-spacing:-.01em}
+  a{color:inherit}
+  nav{position:sticky;top:0;z-index:50;background:rgba(238,244,246,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:760px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{font-family:var(--display);font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-flex;align-items:center;gap:9px;color:var(--fg)}
+  .logo::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px 2px rgba(57,198,238,.85)}
+  .nav-links{display:flex;gap:18px}
+  .nav-links a{font-family:var(--mono);font-size:.82rem;color:var(--muted);text-decoration:none}
+  .nav-links a:hover{color:var(--fg)}
+
+  header{padding:42px 0 6px;text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .eyebrow::before{content:"> ";color:var(--cyan)}
+  h1{font-size:clamp(1.9rem,5vw,2.6rem);font-weight:700;margin:12px 0 8px}
+  header p{color:#3d545f;max-width:520px;margin:0 auto}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:32px 26px;margin:28px 0 20px;text-align:center;position:relative;overflow:hidden}
+  .panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent-bright),var(--cyan))}
+
+  .gauge{margin:6px auto 4px}
+  .big{font-family:var(--display);font-weight:700;font-size:clamp(3rem,12vw,4.6rem);line-height:1;color:var(--accent)}
+  .big .u{font-size:1.1rem;color:var(--muted);font-weight:600;margin-left:6px}
+  .phase{font-family:var(--mono);font-size:.82rem;color:var(--muted);letter-spacing:.05em;min-height:1.2em;text-transform:uppercase}
+  .pass{font-family:var(--mono);font-size:.68rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase;min-height:1em;margin-top:4px}
+
+  .start{margin-top:18px;background:var(--accent);color:#fff;border:none;font-family:var(--mono);font-weight:700;font-size:1rem;
+    padding:15px 40px;border-radius:13px;cursor:pointer;letter-spacing:.03em;box-shadow:var(--glow);transition:.15s}
+  .start:hover{background:#0b76a6;transform:translateY(-2px)}
+  .start:disabled{opacity:.5;cursor:default;transform:none}
+
+  .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+  @media(max-width:520px){.metrics{grid-template-columns:1fr 1fr}}
+  .m{background:var(--field);border:1px solid var(--line);border-radius:13px;padding:14px 10px}
+  .m .k{font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .m .v{font-family:var(--display);font-weight:700;font-size:1.35rem;margin-top:4px}
+  .m .v small{font-size:.7rem;color:var(--muted);font-weight:600}
+  .m .sub{font-family:var(--mono);font-size:.6rem;color:var(--muted);margin-top:3px;min-height:.9em}
+
+  .grade{display:none;margin-top:2px;padding:16px;border-radius:13px;font-weight:700}
+  .grade .lbl{font-family:var(--display);font-size:1.3rem}
+  .grade .desc{font-size:.86rem;font-weight:500;margin-top:3px}
+  .grade.ok{background:rgba(18,161,80,.1);color:var(--ok);border:1px solid rgba(18,161,80,.3)}
+  .grade.warn{background:rgba(217,138,36,.1);color:var(--warn);border:1px solid rgba(217,138,36,.3)}
+  .grade.bad{background:rgba(223,74,65,.1);color:var(--bad);border:1px solid rgba(223,74,65,.3)}
+
+  /* WFC overview */
+  .wfc{margin-top:26px;padding-top:22px;border-top:1px solid var(--line);text-align:left;display:none}
+  .wfc.show{display:block}
+  .wfc .htitle{font-family:var(--mono);font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .wfc-top{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .score-ring{width:88px;height:88px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;position:relative;background:conic-gradient(var(--accent-bright) var(--deg,0deg),#e6eef2 0deg)}
+  .score-ring::after{content:"";position:absolute;inset:7px;border-radius:50%;background:#fff}
+  .score-ring .sc{position:relative;z-index:1;font-family:var(--display);font-weight:700;font-size:1.5rem;color:var(--fg)}
+  .score-ring .sc small{font-size:.8rem;color:var(--muted)}
+  .wfc-verdict{flex:1;min-width:180px;text-align:left}
+  .wfc-verdict .vh{font-family:var(--display);font-weight:700;font-size:1.25rem;color:var(--fg)}
+  .wfc-verdict .vs{color:#3d545f;font-size:.9rem;margin-top:4px}
+  .wfc-tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:16px}
+  .wtag{font-family:var(--mono);font-size:.7rem;font-weight:600;padding:6px 11px;border-radius:8px;border:1px solid var(--line);background:var(--field);color:#3d545f;display:inline-flex;align-items:center;gap:4px}
+  .wtag b{color:var(--fg)}
+  .wtag svg.lucide,.wtag [data-lucide]{width:13px;height:13px;color:var(--accent)}
+  /* per-kategori overview inside WFC card */
+  .qual{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+  .qual .qh{font-family:var(--mono);font-size:.66rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  .qrow{display:flex;align-items:flex-start;gap:12px;padding:12px 0}
+  .qrow+.qrow{border-top:1px solid #eef3f5}
+  .qrow .qi{width:30px;font-size:1.25rem;text-align:center;flex:none;line-height:1.4}
+  .qmid{flex:1;min-width:0}
+  .qtop{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .qtop .qn{font-family:var(--mono);font-size:.8rem;font-weight:700;color:var(--fg)}
+  .qtop .ql{font-family:var(--mono);font-size:.72rem;font-weight:700;flex:none}
+  .qbar{height:7px;border-radius:5px;background:#e7eef2;overflow:hidden;margin:7px 0 6px}
+  .qbar span{display:block;height:100%;border-radius:5px;transition:width .5s}
+  .qdesc{font-size:.82rem;color:#3d545f;line-height:1.45}
+  .q5{color:var(--ok)} .q4{color:#3aa76d} .q3{color:var(--warn)} .q2{color:#e07a2a} .q1{color:var(--bad)}
+  .b5{background:var(--ok)} .b4{background:#3aa76d} .b3{background:var(--warn)} .b2{background:#e07a2a} .b1{background:var(--bad)}
+
+  .after{display:none;margin:0 0 30px;gap:10px;justify-content:center;flex-wrap:wrap}
+  .after.show{display:flex}
+  .abtn{border:1px solid var(--line);background:#fff;color:var(--fg);font-family:var(--mono);font-weight:600;font-size:.82rem;padding:11px 18px;border-radius:11px;cursor:pointer}
+  .abtn:hover{border-color:var(--accent);color:var(--accent)}
+  .note{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:20px}
+  .note b{color:var(--accent);font-weight:700}
+  footer{padding:24px 0 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.8rem}
+  footer a{color:var(--accent);text-decoration:none;font-weight:600}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#132c38;color:#fff;font-family:var(--mono);padding:10px 18px;border-radius:11px;font-size:.82rem;opacity:0;transition:.25s;z-index:99}
+  .toast.show{opacity:1}
+  /* lucide icon sizing per context */
+  [data-lucide],svg.lucide{stroke-width:2;vertical-align:middle}
+  .start svg.lucide,.start [data-lucide]{width:18px;height:18px;margin-right:2px}
+  .abtn svg.lucide,.abtn [data-lucide]{width:15px;height:15px;margin-right:4px}
+  .note svg.lucide,.note [data-lucide]{width:13px;height:13px;color:var(--accent);margin-right:3px}
+  .qrow .qi svg.lucide,.qrow .qi [data-lucide]{width:22px;height:22px;color:var(--accent)}
+  .grade .lbl{display:flex;align-items:center;justify-content:center;gap:8px}
+  .grade .gico svg.lucide,.grade .gico [data-lucide]{width:24px;height:24px}
+  .wfc-verdict .vh{display:flex;align-items:center;gap:8px}
+  .wfc-verdict .vico svg.lucide,.wfc-verdict .vico [data-lucide]{width:22px;height:22px;color:var(--accent)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../wfc/index.html">WFC Place</a>
+      <a href="../../contact/index.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Internet Speedtest</span>
+    <h1>WiFi Speed Test</h1>
+    <p>Ukur kecepatan WiFi tempatmu: download, upload, ping, jitter, plus rating buat browsing, gaming, streaming &amp; video call. Hasilnya dipakai buat review WFC.</p>
+  </header>
+
+  <div class="panel">
+    <div class="gauge">
+      <div class="big"><span id="liveNum">0</span><span class="u" id="liveUnit">Mbps</span></div>
+      <div class="phase" id="phase">Siap tes</div>
+      <div class="pass" id="pass"></div>
+    </div>
+    <button class="start" id="start"><i data-lucide="play"></i> Mulai Tes</button>
+
+    <div class="metrics">
+      <div class="m"><div class="k">Download</div><div class="v" id="mDown">–<small> Mbps</small></div><div class="sub" id="sDown"></div></div>
+      <div class="m"><div class="k">Upload</div><div class="v" id="mUp">–<small> Mbps</small></div><div class="sub" id="sUp"></div></div>
+      <div class="m"><div class="k">Ping</div><div class="v" id="mPing">–<small> ms</small></div><div class="sub"></div></div>
+      <div class="m"><div class="k">Jitter</div><div class="v" id="mJit">–<small> ms</small></div><div class="sub"></div></div>
+    </div>
+
+    <div class="grade" id="grade">
+      <div class="lbl"><span class="gico" id="gradeIco"></span><span id="gradeLbl"></span></div>
+      <div class="desc" id="gradeDesc"></div>
+    </div>
+
+    <div class="note"><i data-lucide="lock"></i> Server tes: <b id="srv">Cloudflare</b> · tidak menyimpan data pribadi</div>
+
+    <!-- WFC overview (nyatu di kartu speedtest) -->
+    <div class="wfc" id="wfc">
+    <div class="htitle">Overview · Layak WFC?</div>
+    <div class="wfc-top">
+      <div class="score-ring" id="ring"><span class="sc"><span id="wfcScore">0</span><small>/100</small></span></div>
+      <div class="wfc-verdict">
+        <div class="vh"><span class="vico" id="wfcIco"></span><span id="wfcVhText"></span></div>
+        <div class="vs" id="wfcVs"></div>
+      </div>
+    </div>
+    <div class="wfc-tags" id="wfcTags"></div>
+    <div class="qual">
+      <div class="qh">Overview per aktivitas</div>
+      <div class="qrow"><div class="qi"><i data-lucide="globe"></i></div><div class="qmid">
+        <div class="qtop"><span class="qn">Browsing</span><span class="ql" id="qBrowse"></span></div>
+        <div class="qbar"><span id="bBrowse"></span></div><div class="qdesc" id="descBrowse"></div></div></div>
+      <div class="qrow"><div class="qi"><i data-lucide="gamepad-2"></i></div><div class="qmid">
+        <div class="qtop"><span class="qn">Gaming</span><span class="ql" id="qGame"></span></div>
+        <div class="qbar"><span id="bGame"></span></div><div class="qdesc" id="descGame"></div></div></div>
+      <div class="qrow"><div class="qi"><i data-lucide="tv"></i></div><div class="qmid">
+        <div class="qtop"><span class="qn">Streaming</span><span class="ql" id="qStream"></span></div>
+        <div class="qbar"><span id="bStream"></span></div><div class="qdesc" id="descStream"></div></div></div>
+      <div class="qrow"><div class="qi"><i data-lucide="video"></i></div><div class="qmid">
+        <div class="qtop"><span class="qn">Video Call</span><span class="ql" id="qVc"></span></div>
+        <div class="qbar"><span id="bVc"></span></div><div class="qdesc" id="descVc"></div></div></div>
+    </div>
+    </div>
+  </div>
+
+  <div class="after" id="after">
+    <button class="abtn" id="btnCopy"><i data-lucide="copy"></i> Salin Hasil</button>
+    <button class="abtn" id="btnJson"><i data-lucide="download"></i> Export JSON</button>
+  </div>
+
+  <footer>WFC Place · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+if(window.lucide) lucide.createIcons();
+var $=function(id){return document.getElementById(id);};
+var RESULT={};
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1500);}
+var DOWN='https://speed.cloudflare.com/__down?bytes=';
+var UP='https://speed.cloudflare.com/__up';
+var SERVER='Cloudflare';
+
+/* ambil lokasi server tes (colo Cloudflare terdekat) */
+(async function(){
+  try{
+    var r=await fetch('https://speed.cloudflare.com/meta',{cache:'no-store'});
+    var m=await r.json();
+    var city=m.city||''; var colo=m.colo||'';
+    SERVER='Cloudflare'+(city?' · '+city:'')+(colo?' ('+colo+')':'');
+    var el=$('srv'); if(el) el.textContent=SERVER;
+  }catch(e){}
+})();
+
+async function measurePing(n){
+  var arr=[];
+  for(var i=0;i<n;i++){
+    var t=performance.now();
+    try{ await fetch(DOWN+'1&r='+Math.random(),{cache:'no-store'}); }catch(e){}
+    arr.push(performance.now()-t);
+  }
+  arr.sort(function(a,b){return a-b;});
+  var mean=arr.reduce(function(a,b){return a+b;},0)/arr.length;
+  var jit=Math.sqrt(arr.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/arr.length);
+  return {ping:arr[Math.floor(arr.length/2)], jitter:jit};
+}
+async function measureDown(bytes,live){
+  var t0=performance.now(), loaded=0;
+  var res=await fetch(DOWN+bytes+'&r='+Math.random(),{cache:'no-store'});
+  var reader=res.body.getReader();
+  while(true){
+    var r=await reader.read(); if(r.done)break; loaded+=r.value.length;
+    if(live){var mbps=(loaded*8)/((performance.now()-t0)/1000)/1e6; $('liveNum').textContent=mbps.toFixed(1);}
+  }
+  var sec=(performance.now()-t0)/1000;
+  return (loaded*8)/sec/1e6;
+}
+async function measureUp(bytes,live){
+  var buf=new Uint8Array(bytes); for(var i=0;i<bytes;i+=4096) buf[i]=Math.random()*255;
+  var t0=performance.now();
+  await fetch(UP,{method:'POST',body:buf,cache:'no-store'});
+  var sec=(performance.now()-t0)/1000;
+  return (bytes*8)/sec/1e6;
+}
+function grade(down,ping){
+  if(down>=25 && ping<60) return ['ok','star','Bagus','Cepat & responsif, enak buat WFC / video call.'];
+  if(down>=8 && ping<120) return ['warn','meh','Cukup','Oke buat browsing & sosmed, tapi bisa nge-lag pas rame.'];
+  return ['bad','snail','Lemot','Lambat / latency tinggi, kurang nyaman buat kerja.'];
+}
+function icon(name){return '<i data-lucide="'+name+'"></i>';}
+
+/* ---- activity scoring (1..5) ---- */
+function scoreBrowse(d,u,p,j){
+  if(p<30 && d>=8) return 5;
+  if(p<55 && d>=4) return 4;
+  if(p<90 && d>=2) return 3;
+  if(p<160 && d>=1) return 2;
+  return 1;
+}
+function scoreGame(d,u,p,j){
+  if(p<25 && j<8) return 5;
+  if(p<45 && j<16) return 4;
+  if(p<75 && j<28) return 3;
+  if(p<130 && j<50) return 2;
+  return 1;
+}
+function scoreStream(d,u,p,j){
+  if(d>=40) return 5;   // 4K nyaman
+  if(d>=22) return 4;   // 4K/1080p
+  if(d>=10) return 3;   // 1080p
+  if(d>=4) return 2;    // 720p
+  return 1;
+}
+function scoreVc(d,u,p,j){
+  if(u>=6 && p<45 && j<15) return 5;
+  if(u>=3 && p<75 && j<26) return 4;
+  if(u>=1.5 && p<120 && j<42) return 3;
+  if(u>=0.7) return 2;
+  return 1;
+}
+var QLABELS={5:'Sangat baik',4:'Baik',3:'Cukup',2:'Kurang',1:'Buruk'};
+var VERDICTS={
+  browse:{5:'Buka web, sosmed, dan chat semua instan.',4:'Browsing lancar, jarang nunggu loading.',3:'Cukup buat browsing biasa, sesekali loading.',2:'Bisa browsing tapi kerasa lambat.',1:'Buka halaman sering lemot atau gagal.'},
+  game:{5:'Ping rendah & stabil, kompetitif aman.',4:'Enak buat main online, jarang lag.',3:'Main santai oke, game cepat bisa lag.',2:'Sering lag / delay pas main online.',1:'Ping tinggi, susah buat game online.'},
+  stream:{5:'Sanggup 4K tanpa buffering.',4:'Lancar sampai 4K / 1080p.',3:'Aman di 1080p, 4K bisa buffering.',2:'Mentok 720p, kadang buffering.',1:'Sering buffering walau resolusi rendah.'},
+  vc:{5:'Video call HD grup mulus & jernih.',4:'Zoom / Meet lancar, jarang putus.',3:'Video call oke, sesekali patah.',2:'Sering patah atau gambar pecah.',1:'Susah video call, mending audio aja.'}
+};
+function paintQual(barId,labId,descId,cat,n){
+  var b=$(barId); b.className='b'+n; b.style.width=(n*20)+'%';
+  var l=$(labId); l.className='ql q'+n; l.textContent=QLABELS[n];
+  if(descId&&VERDICTS[cat]) $(descId).textContent=VERDICTS[cat][n];
+}
+
+/* ---- WFC overview ---- */
+function wfcOverview(sc){
+  // weighted: browsing & vc matter most buat kerja di cafe
+  var weighted=(sc.browse*0.3 + sc.vc*0.3 + sc.stream*0.15 + sc.game*0.25);
+  var score100=Math.round((weighted/5)*100);
+  var v;
+  if(score100>=85) v=['rocket','Kecepatan Ideal','Ngebut & stabil untuk video call, kerja berat, semua lancar.'];
+  else if(score100>=68) v=['circle-check','Kecepatan Solid','Nyaman buat kerja, meeting online, dan multitask.'];
+  else if(score100>=50) v=['thumbs-up','Cukup layak','Aman buat kerja ringan & browsing, hati-hati pas jam rame.'];
+  else if(score100>=32) v=['triangle-alert','Terbatas','Buat email & browsing masih oke, video call bisa patah-patah.'];
+  else v=['snail','Kurang layak','Lemot / latency tinggi, kurang nyaman buat kerja serius.'];
+  return {score:score100, icon:v[0], head:v[1], sub:v[2]};
+}
+
+$('start').addEventListener('click', async function(){
+  var btn=this; btn.disabled=true;
+  $('grade').style.display='none';
+  $('wfc').classList.remove('show'); $('after').classList.remove('show');
+  $('pass').textContent='';
+  ['mDown','mUp','mPing','mJit'].forEach(function(id){$(id).innerHTML='<span style="color:#c0c8ce">…</span>';});
+  $('sDown').textContent=''; $('sUp').textContent='';
+  try{
+    // PING
+    $('phase').textContent='Mengukur ping…'; $('liveUnit').textContent='ms'; $('liveNum').textContent='0';
+    var p=await measurePing(8);
+    $('mPing').innerHTML=Math.round(p.ping)+'<small> ms</small>';
+    $('mJit').innerHTML=Math.round(p.jitter)+'<small> ms</small>';
+
+    // DOWNLOAD — 2 pass, ambil terbaik
+    $('phase').textContent='Mengukur download…'; $('liveUnit').textContent='Mbps';
+    await measureDown(2000000,false); // warmup
+    $('pass').textContent='Download · pass 1 / 2';
+    var d1=await measureDown(30000000,true);
+    $('pass').textContent='Download · pass 2 / 2';
+    var d2=await measureDown(30000000,true);
+    var down=Math.max(d1,d2);
+    $('liveNum').textContent=down.toFixed(1);
+    $('mDown').innerHTML=down.toFixed(1)+'<small> Mbps</small>';
+    $('sDown').textContent=d1.toFixed(0)+' / '+d2.toFixed(0);
+
+    // UPLOAD — 2 pass, ambil terbaik
+    $('phase').textContent='Mengukur upload…'; $('liveUnit').textContent='Mbps'; $('liveNum').textContent='0';
+    var u1=0,u2=0;
+    try{
+      $('pass').textContent='Upload · pass 1 / 2';
+      u1=await measureUp(8000000,false); $('liveNum').textContent=u1.toFixed(1);
+      $('pass').textContent='Upload · pass 2 / 2';
+      u2=await measureUp(8000000,false); $('liveNum').textContent=Math.max(u1,u2).toFixed(1);
+    }catch(e){}
+    var up=Math.max(u1,u2);
+    $('mUp').innerHTML=(up?up.toFixed(1):'–')+'<small> Mbps</small>';
+    if(up) $('sUp').textContent=u1.toFixed(0)+' / '+u2.toFixed(0);
+
+    // DONE
+    $('phase').textContent='Selesai ✓'; $('pass').textContent='';
+    var g=grade(down,p.ping);
+    var ge=$('grade'); ge.className='grade '+g[0]; ge.style.display='block';
+    $('gradeIco').innerHTML=icon(g[1]); $('gradeLbl').textContent=g[2]; $('gradeDesc').textContent=g[3];
+
+    // activity ratings
+    var sc={
+      browse:scoreBrowse(down,up,p.ping,p.jitter),
+      game:scoreGame(down,up,p.ping,p.jitter),
+      stream:scoreStream(down,up,p.ping,p.jitter),
+      vc:scoreVc(down,up,p.ping,p.jitter)
+    };
+    // WFC overview
+    var ov=wfcOverview(sc);
+    $('wfcScore').textContent=ov.score;
+    $('wfcIco').innerHTML=icon(ov.icon);
+    $('wfcVhText').textContent=ov.head;
+    $('wfcVs').textContent=ov.sub;
+    $('ring').style.setProperty('--deg',(ov.score*3.6)+'deg');
+    paintQual('bBrowse','qBrowse','descBrowse','browse',sc.browse);
+    paintQual('bGame','qGame','descGame','game',sc.game);
+    paintQual('bStream','qStream','descStream','stream',sc.stream);
+    paintQual('bVc','qVc','descVc','vc',sc.vc);
+    $('wfcTags').innerHTML=
+      '<span class="wtag">'+icon('arrow-down')+'<b>'+down.toFixed(0)+'</b> Mbps</span>'+
+      '<span class="wtag">'+icon('arrow-up')+'<b>'+(up?up.toFixed(0):'–')+'</b> Mbps</span>'+
+      '<span class="wtag">ping <b>'+Math.round(p.ping)+'</b> ms</span>'+
+      '<span class="wtag">jitter <b>'+Math.round(p.jitter)+'</b> ms</span>';
+    $('wfc').classList.add('show');
+    $('after').classList.add('show');
+    if(window.lucide) lucide.createIcons();
+
+    RESULT={
+      download:+down.toFixed(1), download_passes:[+d1.toFixed(1),+d2.toFixed(1)],
+      upload:+(up?up.toFixed(1):0), upload_passes:[+u1.toFixed(1),+u2.toFixed(1)],
+      ping:Math.round(p.ping), jitter:Math.round(p.jitter),
+      grade:g[1],
+      activities:{browsing:sc.browse, gaming:sc.game, streaming:sc.stream, video_call:sc.vc},
+      wfc_score:ov.score, wfc_verdict:ov.head,
+      server:SERVER,
+      at:new Date().toISOString()
+    };
+  }catch(e){
+    $('phase').textContent='Gagal — cek koneksi & coba lagi'; $('pass').textContent='';
+    toast('Tes gagal');
+  }
+  btn.disabled=false;
+});
+$('btnCopy').addEventListener('click',function(){
+  var a=RESULT.activities||{};
+  var s='WiFi: ⬇ '+RESULT.download+' Mbps · ⬆ '+RESULT.upload+' Mbps · ping '+RESULT.ping+'ms · jitter '+RESULT.jitter+'ms'
+    +' | '+RESULT.grade
+    +' | Browsing '+a.browsing+'/5 · Gaming '+a.gaming+'/5 · Streaming '+a.streaming+'/5 · VC '+a.video_call+'/5'
+    +' | WFC score '+RESULT.wfc_score+'/100 ('+RESULT.wfc_verdict+')';
+  navigator.clipboard&&navigator.clipboard.writeText(s); toast('Hasil disalin');
+});
+$('btnJson').addEventListener('click',function(){
+  var blob=new Blob([JSON.stringify(RESULT,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='wifi-speedtest.json'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+});
+</script>
+</body>
+</html>

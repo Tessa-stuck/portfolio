@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Kopi Contoh",
+    "area": "Jakarta Selatan",
+    "lat": -6.2607,
+    "lng": 106.8106,
+    "rating": 4,
+    "wifi": { "download": 32, "upload": 11, "ping": 26, "jitter": 4, "grade": "⭐ Bagus" },
+    "price": "Rp25rb-an",
+    "notes": "WiFi kenceng & stabil, colokan banyak, tempat adem buat WFC.",
+    "date": "2026-09-12"
+  },
+  {
+    "name": "Warkop Demo",
+    "area": "Bandung",
+    "lat": -6.9147,
+    "lng": 107.6098,
+    "rating": 2,
+    "wifi": { "download": 6, "upload": 2, "ping": 90, "jitter": 22, "grade": "🐢 Lemot" },
+    "price": "Rp15rb-an",
+    "notes": "Cuma andalkan ONT bawaan ISP, ngedrop pas rame. Colokan terbatas.",
+    "date": "2026-09-12"
+  }
+]
