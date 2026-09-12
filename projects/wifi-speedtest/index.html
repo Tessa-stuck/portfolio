@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WiFi Speed Test — Tessa</title>
-<meta name="description" content="Tes kecepatan WiFi: download, upload, ping, jitter + rating browsing, gaming, streaming, video call. Bagian dari WFC Place.">
+<title>Internet Speed Test — Tessa</title>
+<meta name="description" content="Tes kecepatan internet: download, upload, ping, jitter + rating kualitas buat browsing, gaming, streaming, dan video call. Langsung di browser.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
   <header>
     <span class="eyebrow">Internet Speedtest</span>
     <h1>WiFi Speed Test</h1>
-    <p>Ukur kecepatan WiFi tempatmu: download, upload, ping, jitter, plus rating buat browsing, gaming, streaming &amp; video call. Hasilnya dipakai buat review WFC.</p>
+    <p>Ukur kecepatan internetmu: download, upload, ping, jitter, plus rating kualitas buat browsing, gaming, streaming &amp; video call.</p>
   </header>
 
   <div class="panel">
@@ -167,7 +167,7 @@
 
     <!-- WFC overview (nyatu di kartu speedtest) -->
     <div class="wfc" id="wfc">
-    <div class="htitle">Overview · Layak WFC?</div>
+    <div class="htitle">Overview · Kualitas Internet</div>
     <div class="wfc-top">
       <div class="score-ring" id="ring"><span class="sc"><span id="wfcScore">0</span><small>/100</small></span></div>
       <div class="wfc-verdict">
@@ -199,7 +199,7 @@
     <button class="abtn" id="btnJson"><i data-lucide="download"></i> Export JSON</button>
   </div>
 
-  <footer>WFC Place · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
+  <footer>Internet Speed Test · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -219,8 +219,8 @@ var SERVER='Cloudflare';
   try{
     var r=await fetch('https://speed.cloudflare.com/meta',{cache:'no-store'});
     var m=await r.json();
-    var city=m.city||''; var colo=m.colo||'';
-    SERVER='Cloudflare'+(city?' · '+city:'')+(colo?' ('+colo+')':'');
+    var colo=(typeof m.colo==='string')?m.colo:'';
+    SERVER=colo?('Cloudflare · '+colo):'Cloudflare';
     var el=$('srv'); if(el) el.textContent=SERVER;
   }catch(e){}
 })();
@@ -256,7 +256,7 @@ async function measureUp(bytes,live){
   return (bytes*8)/sec/1e6;
 }
 function grade(down,ping){
-  if(down>=25 && ping<60) return ['ok','star','Bagus','Cepat & responsif, enak buat WFC / video call.'];
+  if(down>=25 && ping<60) return ['ok','star','Bagus','Cepat & responsif, enak buat kerja & video call.'];
   if(down>=8 && ping<120) return ['warn','meh','Cukup','Oke buat browsing & sosmed, tapi bisa nge-lag pas rame.'];
   return ['bad','snail','Lemot','Lambat / latency tinggi, kurang nyaman buat kerja.'];
 }
@@ -396,7 +396,7 @@ $('start').addEventListener('click', async function(){
       ping:Math.round(p.ping), jitter:Math.round(p.jitter),
       grade:g[1],
       activities:{browsing:sc.browse, gaming:sc.game, streaming:sc.stream, video_call:sc.vc},
-      wfc_score:ov.score, wfc_verdict:ov.head,
+      overall_score:ov.score, overall_verdict:ov.head,
       server:SERVER,
       at:new Date().toISOString()
     };
@@ -411,7 +411,7 @@ $('btnCopy').addEventListener('click',function(){
   var s='WiFi: ⬇ '+RESULT.download+' Mbps · ⬆ '+RESULT.upload+' Mbps · ping '+RESULT.ping+'ms · jitter '+RESULT.jitter+'ms'
     +' | '+RESULT.grade
     +' | Browsing '+a.browsing+'/5 · Gaming '+a.gaming+'/5 · Streaming '+a.streaming+'/5 · VC '+a.video_call+'/5'
-    +' | WFC score '+RESULT.wfc_score+'/100 ('+RESULT.wfc_verdict+')';
+    +' | Skor internet '+RESULT.overall_score+'/100 ('+RESULT.overall_verdict+')';
   navigator.clipboard&&navigator.clipboard.writeText(s); toast('Hasil disalin');
 });
 $('btnJson').addEventListener('click',function(){

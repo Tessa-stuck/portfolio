@@ -47,6 +47,7 @@
   .fg label{display:block;font-size:.78rem;font-weight:700;color:#334155;margin-bottom:6px}
   .fg input,.fg textarea,.fg select{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;font:inherit;font-size:.95rem;background:#fff}
   .fg input:focus,.fg textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,143,202,.14)}
+  .fg input[readonly]{background:var(--field);color:var(--fg);cursor:default}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
   .grid4{display:grid;grid-template-columns:1fr 1fr;gap:10px}
   .starpick{display:flex;gap:4px;font-size:1.6rem;color:#d8dee2;cursor:pointer}
@@ -56,6 +57,36 @@
   .hintline{font-size:.75rem;color:var(--muted);margin-top:6px}
   .sheet .row-actions{display:flex;gap:10px;margin-top:18px}
   .sheet .row-actions .tbtn{flex:1;text-align:center}
+
+  /* Google-review style card bits */
+  .cafe .cover{margin:-20px -20px 14px;height:152px;background:#e7eef2 center/cover no-repeat;border-bottom:1px solid var(--line)}
+  .rateline{display:flex;align-items:center;gap:8px;margin:6px 0 4px}
+  .rateline .num{font-weight:800;color:var(--fg);font-size:.95rem}
+  .rateline .stars{margin:0}
+  .cafe p.notes{color:#3d545f;font-size:.9rem;margin:10px 0 2px;line-height:1.5}
+  .cafe p.notes::before{content:"\201C";color:var(--accent);font-weight:800;margin-right:2px}
+  .cafe p.notes::after{content:"\201D";color:var(--accent);font-weight:800;margin-left:1px}
+  .cafe .gmaps{display:inline-block;font-family:var(--mono);font-size:.74rem;font-weight:600;color:var(--accent);text-decoration:none;margin:8px 0 2px}
+  .cafe .gmaps:hover{text-decoration:underline}
+  .gal{margin:12px 0 4px}
+  .gal .glabel{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:5px}
+  .thumbs{display:flex;gap:7px;flex-wrap:wrap}
+  .thumbs img{width:58px;height:58px;object-fit:cover;border-radius:9px;border:1px solid var(--line);cursor:pointer;transition:.15s}
+  .thumbs img:hover{border-color:var(--accent);transform:scale(1.05)}
+  .speedshot{width:100%;max-height:220px;object-fit:contain;background:var(--field);border:1px solid var(--line);border-radius:11px;cursor:pointer;margin-top:2px}
+  /* lightbox */
+  .lb{display:none;position:fixed;inset:0;z-index:2000;background:rgba(10,20,26,.9);align-items:center;justify-content:center;padding:24px}
+  .lb.open{display:flex}
+  .lb img{max-width:100%;max-height:90vh;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+  .lb .close{position:absolute;top:16px;right:22px;color:#fff;font-size:2rem;line-height:1;cursor:pointer;font-family:var(--mono)}
+  /* upload widget */
+  .up{display:block;border:1.5px dashed var(--line);border-radius:11px;padding:13px;text-align:center;cursor:pointer;font-size:.82rem;color:var(--muted);background:var(--field);font-weight:600}
+  .up:hover{border-color:var(--accent);color:var(--accent)}
+  .up input{display:none}
+  .prev{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+  .prev .pi{position:relative;width:56px;height:56px}
+  .prev .pi img{width:56px;height:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+  .prev .pi b{position:absolute;top:-6px;right:-6px;background:#df4a41;color:#fff;width:18px;height:18px;border-radius:50%;font-size:.8rem;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;border:2px solid #fff}
   @media(max-width:820px){#map{height:300px}}
 </style>
 </head>
@@ -104,36 +135,50 @@
   <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
 </footer>
 
+<!-- Lightbox -->
+<div class="lb" id="lb"><span class="close" id="lbClose">×</span><img id="lbImg" src="" alt=""></div>
+
 <!-- Add Cafe modal -->
 <div class="modal" id="modal">
   <div class="sheet">
     <h2>Tambah Cafe</h2>
-    <div class="sub">Tambahan tersimpan di browser dulu. Klik <b>Export data</b> lalu commit <code>cafes.json</code> biar tayang.</div>
+    <div class="sub">Tambahan tersimpan di browser dulu (foto dikompres otomatis). Klik <b>Export data</b> lalu commit <code>cafes.json</code> biar tayang.</div>
     <div class="fg"><label>Nama Cafe</label><input type="text" id="fName" placeholder="Kopi ..."></div>
     <div class="grid2">
       <div class="fg"><label>Area / Kota</label><input type="text" id="fArea" placeholder="Jakarta Selatan"></div>
       <div class="fg"><label>Harga rata-rata</label><input type="text" id="fPrice" placeholder="Rp25rb-an"></div>
     </div>
     <div class="fg"><label>Rating</label><div class="starpick" id="starPick" data-v="0"><span data-i="1">★</span><span data-i="2">★</span><span data-i="3">★</span><span data-i="4">★</span><span data-i="5">★</span></div></div>
-    <div class="fg"><label>Lokasi (klik peta atau pakai GPS)</label>
+    <div class="fg"><label>Koordinat (tempel / klik peta / GPS)</label>
       <div class="locrow">
-        <input type="text" id="fLat" placeholder="Latitude" readonly>
-        <input type="text" id="fLng" placeholder="Longitude" readonly>
+        <input type="text" id="fCoord" placeholder="-6.819873, 107.136378">
         <button class="tbtn" id="btnGps" type="button">📍 GPS</button>
       </div>
-      <div class="hintline">Klik titik di peta untuk set lokasi, atau tekan GPS (kalau lagi di cafe-nya).</div>
+      <div class="hintline">Tempel "lat, lng" dari Google Maps, klik titik di peta, atau tekan GPS (kalau lagi di cafe-nya).</div>
+    </div>
+    <div class="fg"><label>Link Google Maps <span style="font-weight:400;color:var(--muted)">(opsional)</span></label>
+      <input type="text" id="fGmap" placeholder="https://maps.app.goo.gl/...">
+      <div class="hintline">Kalau link-nya ada koordinatnya, kolom koordinat di atas keisi otomatis.</div>
     </div>
     <div class="fg"><label>Kecepatan WiFi</label>
-      <button class="tbtn primary" id="btnRunTest" type="button" style="margin-bottom:10px">▶ <span id="testLabel">Jalankan Speed Test</span></button>
+      <button class="tbtn primary" id="btnRunTest" type="button" style="width:100%;margin-bottom:10px">▶ <span id="testLabel">Jalankan Speed Test</span></button>
       <div class="grid4">
-        <input type="number" id="fDown" placeholder="Download (Mbps)">
-        <input type="number" id="fUp" placeholder="Upload (Mbps)">
-        <input type="number" id="fPing" placeholder="Ping (ms)">
-        <input type="number" id="fJit" placeholder="Jitter (ms)">
+        <input type="number" id="fDown" placeholder="Download (Mbps)" readonly>
+        <input type="number" id="fUp" placeholder="Upload (Mbps)" readonly>
+        <input type="number" id="fPing" placeholder="Ping (ms)" readonly>
+        <input type="number" id="fJit" placeholder="Jitter (ms)" readonly>
       </div>
-      <div class="hintline">Jalankan test pas lagi konek WiFi cafe-nya, atau isi manual.</div>
+      <div class="hintline">Klik pas lagi konek WiFi cafe-nya — angka keisi otomatis dari hasil tes (rata-rata 2x, nggak bisa diedit manual biar jujur).</div>
     </div>
-    <div class="fg"><label>Catatan</label><textarea id="fNotes" rows="2" placeholder="WiFi kenceng, colokan banyak, adem..."></textarea></div>
+    <div class="fg"><label>Komentar / Review</label><textarea id="fNotes" rows="2" placeholder="WiFi kenceng, colokan banyak, adem, cocok buat WFC..."></textarea></div>
+    <div class="fg"><label>Foto Lokasi</label>
+      <label class="up">+ Tambah foto lokasi<input type="file" id="fLoc" accept="image/*" multiple></label>
+      <div class="prev" id="prevLoc"></div>
+    </div>
+    <div class="fg"><label>Foto Menu</label>
+      <label class="up">+ Tambah foto menu<input type="file" id="fMenu" accept="image/*" multiple></label>
+      <div class="prev" id="prevMenu"></div>
+    </div>
     <div class="row-actions">
       <button class="tbtn" id="btnCancel" type="button">Batal</button>
       <button class="tbtn primary" id="btnSave" type="button">Simpan Cafe</button>
@@ -153,7 +198,7 @@ async function loadData(){
   else { try{ var r=await fetch('cafes.json',{cache:'no-store'}); WORK=await r.json(); }catch(e){ WORK=[]; } }
   render();
 }
-function save(){ try{ localStorage.setItem('tessa_cafes', JSON.stringify(WORK)); }catch(e){} }
+function save(){ try{ localStorage.setItem('tessa_cafes', JSON.stringify(WORK)); }catch(e){ alert('Penyimpanan browser penuh (foto terlalu banyak/besar). Klik Export data buat simpan cafes.json sekarang ya.'); } }
 
 /* ---- map ---- */
 function initMap(){
@@ -183,11 +228,14 @@ function render(){
   if(!WORK.length){ el.innerHTML='<p style="color:var(--muted)">Belum ada cafe. Klik "Tambah Cafe".</p>'; return; }
   el.innerHTML=WORK.map(function(c,i){
     var w=c.wifi||{};
+    var ph=c.photos||{};
     var gcol=c.rating>=4?'#12a150':(c.rating>=3?'#d98a24':'#df4a41');
+    var cover=(ph.loc&&ph.loc[0])?'<div class="cover" style="background-image:url('+ph.loc[0]+')"></div>':'';
     return '<div class="cafe">'
+      +cover
       +'<div class="area">'+esc(c.area||'-')+'</div>'
       +'<h3>'+esc(c.name)+'</h3>'
-      +'<div class="stars">'+stars(c.rating)+'</div>'
+      +'<div class="rateline"><div class="stars">'+stars(c.rating)+'</div><span class="num">'+(c.rating?c.rating.toFixed(1):'–')+'</span></div>'
       +(w.grade?'<div class="gradetag" style="color:'+gcol+'">'+esc(w.grade)+'</div>':'')
       +'<div class="wifi">'
         +'<div class="cell"><div class="k">Download</div><div class="v">'+(w.download!=null?w.download+' <small>Mbps</small>':'-')+'</div></div>'
@@ -196,19 +244,49 @@ function render(){
         +'<div class="cell"><div class="k">Jitter</div><div class="v">'+(w.jitter!=null?w.jitter+' <small>ms</small>':'-')+'</div></div>'
       +'</div>'
       +(c.notes?'<p class="notes">'+esc(c.notes)+'</p>':'')
+      +(function(){var g=c.gmap||(c.lat!=null&&c.lng!=null?('https://www.google.com/maps?q='+c.lat+','+c.lng):'');return g?'<a class="gmaps" href="'+esc(g)+'" target="_blank" rel="noopener">📍 Lihat di Google Maps</a>':'';})()
+      +gallery('Foto Lokasi','📍',ph.loc)
+      +gallery('Foto Menu','🍽️',ph.menu)
       +'<div class="meta"><span>'+esc(c.price||'')+(c.date?' · '+esc(c.date):'')+'</span><button class="del" onclick="delCafe('+i+')">Hapus</button></div>'
     +'</div>';
   }).join('');
 }
+function gallery(label,ico,arr){
+  if(!arr||!arr.length) return '';
+  return '<div class="gal"><div class="glabel">'+ico+' '+label+'</div><div class="thumbs">'+
+    arr.map(function(s){return '<img src="'+s+'" onclick="openLB(this.src)">';}).join('')+'</div></div>';
+}
+/* ---- lightbox ---- */
+function openLB(src){ $('lbImg').src=src; $('lb').classList.add('open'); }
+function closeLB(){ $('lb').classList.remove('open'); $('lbImg').src=''; }
+$('lbClose').addEventListener('click',closeLB);
+$('lb').addEventListener('click',function(e){ if(e.target===this) closeLB(); });
 function delCafe(i){ if(!confirm('Hapus cafe ini?'))return; WORK.splice(i,1); save(); render(); }
 
 /* ---- add form ---- */
 function openModal(){ $('modal').classList.add('open'); }
 function closeModal(){ $('modal').classList.remove('open'); if(tempMarker){map.removeLayer(tempMarker);tempMarker=null;} }
-function setLoc(lat,lng){ $('fLat').value=lat.toFixed(6); $('fLng').value=lng.toFixed(6);
+function setLoc(lat,lng){ $('fCoord').value=lat.toFixed(6)+', '+lng.toFixed(6);
   if(tempMarker)map.removeLayer(tempMarker); tempMarker=L.marker([lat,lng]).addTo(map); }
+function parseCoord(){
+  var v=$('fCoord').value.trim(); if(!v) return null;
+  var m=v.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/); if(!m) return null;
+  var la=+m[1], ln=+m[2];
+  if(isNaN(la)||isNaN(ln)||la<-90||la>90||ln<-180||ln>180) return null;
+  return {lat:la, lng:ln};
+}
+function extractFromGmap(url){
+  if(!url) return null;
+  var m=url.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/[?&]q=(-?\d+\.\d+),(-?\d+\.\d+)/) || url.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  return m?{lat:+m[1], lng:+m[2]}:null;
+}
 $('btnAdd').addEventListener('click',openModal);
 $('btnCancel').addEventListener('click',closeModal);
+$('fGmap').addEventListener('input',function(){
+  if(parseCoord()) return; // koordinat udah keisi manual, jangan timpa
+  var c=extractFromGmap(this.value.trim());
+  if(c){ setLoc(c.lat,c.lng); if(map) map.setView([c.lat,c.lng],15); }
+});
 $('btnGps').addEventListener('click',function(){
   if(!navigator.geolocation){alert('GPS tidak didukung');return;}
   this.textContent='...'; var b=this;
@@ -220,19 +298,56 @@ Array.prototype.forEach.call($('starPick').children,function(s){
   s.addEventListener('click',function(){ pickRating=+s.getAttribute('data-i'); paintStars(); });
 });
 function paintStars(){ Array.prototype.forEach.call($('starPick').children,function(s){ s.className=(+s.getAttribute('data-i')<=pickRating)?'on':''; }); }
+
+/* ---- foto: kompres + preview ---- */
+var PICS={prevLoc:[],prevMenu:[]};
+function compress(file,max,q){return new Promise(function(res){
+  var url=URL.createObjectURL(file), img=new Image();
+  img.onload=function(){
+    var w=img.width,h=img.height, scale=Math.min(1,max/Math.max(w,h));
+    var cw=Math.round(w*scale), ch=Math.round(h*scale);
+    var cv=document.createElement('canvas'); cv.width=cw; cv.height=ch;
+    cv.getContext('2d').drawImage(img,0,0,cw,ch);
+    URL.revokeObjectURL(url);
+    try{ res(cv.toDataURL('image/jpeg',q)); }catch(e){ res(null); }
+  };
+  img.onerror=function(){ URL.revokeObjectURL(url); res(null); };
+  img.src=url;
+});}
+async function addFiles(files,previewId,single){
+  for(var i=0;i<files.length;i++){
+    var d=await compress(files[i],1200,0.72);
+    if(d){ if(single) PICS[previewId]=[d]; else PICS[previewId].push(d); }
+    if(single) break;
+  }
+  renderPrev(previewId);
+}
+function renderPrev(previewId){
+  $(previewId).innerHTML=PICS[previewId].map(function(src,idx){
+    return '<div class="pi"><img src="'+src+'"><b onclick="rmPrev(\''+previewId+'\','+idx+')">×</b></div>';
+  }).join('');
+}
+function rmPrev(previewId,idx){ PICS[previewId].splice(idx,1); renderPrev(previewId); }
+$('fLoc').addEventListener('change',function(e){ addFiles(e.target.files,'prevLoc',false); e.target.value=''; });
+$('fMenu').addEventListener('change',function(e){ addFiles(e.target.files,'prevMenu',false); e.target.value=''; });
 $('btnSave').addEventListener('click',function(){
   var name=$('fName').value.trim(); if(!name){alert('Isi nama cafe');return;}
   var d=$('fDown').value, u=$('fUp').value, p=$('fPing').value, j=$('fJit').value;
   var grade='';
   if(d!==''){ var dn=+d, pn=+(p||999); grade = (dn>=25&&pn<60)?'⭐ Bagus':((dn>=8&&pn<120)?'😐 Cukup':'🐢 Lemot'); }
+  var co=parseCoord();
   var cafe={ name:name, area:$('fArea').value.trim(), price:$('fPrice').value.trim(), rating:pickRating||0,
-    lat:$('fLat').value?+$('fLat').value:null, lng:$('fLng').value?+$('fLng').value:null,
+    lat:co?co.lat:null, lng:co?co.lng:null, gmap:$('fGmap').value.trim()||'',
     wifi:{ download:d!==''?+d:null, upload:u!==''?+u:null, ping:p!==''?+p:null, jitter:j!==''?+j:null, grade:grade },
-    notes:$('fNotes').value.trim(), date:new Date().toISOString().slice(0,10) };
+    notes:$('fNotes').value.trim(),
+    photos:{ loc:PICS.prevLoc.slice(), menu:PICS.prevMenu.slice() },
+    date:new Date().toISOString().slice(0,10) };
   WORK.unshift(cafe); save(); render(); closeModal();
   // reset form
-  ['fName','fArea','fPrice','fLat','fLng','fDown','fUp','fPing','fJit','fNotes'].forEach(function(id){$(id).value='';});
+  ['fName','fArea','fPrice','fCoord','fGmap','fDown','fUp','fPing','fJit','fNotes'].forEach(function(id){$(id).value='';});
   pickRating=0; paintStars();
+  PICS.prevLoc=[]; PICS.prevMenu=[];
+  renderPrev('prevLoc'); renderPrev('prevMenu');
 });
 
 /* ---- export / reset ---- */
@@ -248,25 +363,28 @@ $('btnReset').addEventListener('click',async function(){
   render();
 });
 
-/* ---- speed test in form (ringkas) ---- */
+/* ---- speed test inline (isi field otomatis, rata-rata 2x) ---- */
 var DOWN='https://speed.cloudflare.com/__down?bytes=', UP='https://speed.cloudflare.com/__up';
+async function dl(bytes){var t0=performance.now(),loaded=0;var res=await fetch(DOWN+bytes+'&r='+Math.random(),{cache:'no-store'});var rd=res.body.getReader();while(true){var r=await rd.read();if(r.done)break;loaded+=r.value.length;}return (loaded*8)/((performance.now()-t0)/1000)/1e6;}
+async function ul(bytes){var buf=new Uint8Array(bytes);var t0=performance.now();await fetch(UP,{method:'POST',body:buf,cache:'no-store'});return (bytes*8)/((performance.now()-t0)/1000)/1e6;}
 $('btnRunTest').addEventListener('click',async function(){
   var lbl=$('testLabel'); this.disabled=true;
+  ['fDown','fUp','fPing','fJit'].forEach(function(id){$(id).value='';});
   try{
     lbl.textContent='Ping...';
-    var arr=[]; for(var i=0;i<6;i++){var t=performance.now();try{await fetch(DOWN+'1&r='+Math.random(),{cache:'no-store'});}catch(e){}arr.push(performance.now()-t);}
-    arr.sort(function(a,b){return a-b;}); var mean=arr.reduce(function(a,b){return a+b;},0)/arr.length;
+    var arr=[];for(var i=0;i<6;i++){var t=performance.now();try{await fetch(DOWN+'1&r='+Math.random(),{cache:'no-store'});}catch(e){}arr.push(performance.now()-t);}
+    arr.sort(function(a,b){return a-b;});var mean=arr.reduce(function(a,b){return a+b;},0)/arr.length;
     var jit=Math.sqrt(arr.reduce(function(a,b){return a+(b-mean)*(b-mean);},0)/arr.length);
-    $('fPing').value=Math.round(arr[Math.floor(arr.length/2)]); $('fJit').value=Math.round(jit);
-    lbl.textContent='Download...';
-    var t0=performance.now(),loaded=0; var res=await fetch(DOWN+'25000000&r='+Math.random(),{cache:'no-store'});
-    var rd=res.body.getReader(); while(true){var r=await rd.read();if(r.done)break;loaded+=r.value.length;}
-    var down=(loaded*8)/((performance.now()-t0)/1000)/1e6; $('fDown').value=down.toFixed(1);
-    lbl.textContent='Upload...';
-    try{ var buf=new Uint8Array(6000000); var u0=performance.now(); await fetch(UP,{method:'POST',body:buf,cache:'no-store'});
-      $('fUp').value=((6000000*8)/((performance.now()-u0)/1000)/1e6).toFixed(1); }catch(e){}
-    lbl.textContent='Jalankan Speed Test';
-  }catch(e){ lbl.textContent='Gagal, isi manual'; }
+    $('fPing').value=Math.round(arr[Math.floor(arr.length/2)]);$('fJit').value=Math.round(jit);
+    lbl.textContent='Download... (1/2)';
+    await dl(2000000); // warmup
+    var d1=await dl(20000000); lbl.textContent='Download... (2/2)'; var d2=await dl(20000000);
+    $('fDown').value=((d1+d2)/2).toFixed(1);
+    lbl.textContent='Upload... (1/2)';
+    try{ var u1=await ul(6000000); lbl.textContent='Upload... (2/2)'; var u2=await ul(6000000); $('fUp').value=((u1+u2)/2).toFixed(1); }catch(e){}
+    lbl.textContent='Selesai ✓';
+    setTimeout(function(){lbl.textContent='Jalankan Ulang';},1600);
+  }catch(e){ lbl.textContent='Gagal, coba lagi'; }
   this.disabled=false;
 });
 
