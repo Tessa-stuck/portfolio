@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Image Data Extractor — Tessa</title>
+<meta name="description" content="Ekstrak EXIF, GPS, info file, palet warna, dan teks (OCR) dari gambar. 100% di browser, gambar tidak diupload.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+<style>
+  :root{
+    --bg:#eef4f6;--card:#ffffff;--panel-2:#f6fafb;--fg:#132c38;--muted:#5a7280;--line:#d0dfe4;--line-soft:#e3ecef;
+    --accent:#0e8fca;--accent-bright:#39c6ee;--cyan:#0fa9b6;--field:#f4f7f8;--ok:#12a150;--radius:14px;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --display:'Space Grotesk','Inter',system-ui,sans-serif;
+    --glow-accent:0 8px 26px -12px rgba(14,143,202,.5), 0 0 0 1px rgba(57,198,238,.4);
+    --shadow:0 10px 30px -16px rgba(19,44,56,.28);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--fg);line-height:1.55;-webkit-font-smoothing:antialiased;
+    min-height:100vh;position:relative;
+    background:
+      radial-gradient(1100px 620px at 90% -10%, rgba(57,198,238,.20), transparent 60%),
+      radial-gradient(900px 640px at 6% 8%, rgba(15,169,182,.16), transparent 55%),
+      var(--bg);
+    background-attachment:fixed;}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(14,143,202,.06) 1px, transparent 1px),linear-gradient(90deg, rgba(14,143,202,.06) 1px, transparent 1px);
+    background-size:46px 46px;mask-image:radial-gradient(circle at 50% 20%, #000 30%, transparent 92%)}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+  h1,h2,h3{font-family:var(--display);letter-spacing:-.01em}
+  a{color:inherit}
+
+  /* NAV */
+  nav{position:sticky;top:0;z-index:50;background:rgba(238,244,246,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:1000px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{font-family:var(--display);font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-flex;align-items:center;gap:9px;color:var(--fg)}
+  .logo::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px 2px rgba(57,198,238,.85);animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+  .nav-links{display:flex;gap:20px;align-items:center}
+  .nav-links a{font-family:var(--mono);font-size:.82rem;font-weight:500;color:var(--muted);text-decoration:none;letter-spacing:.02em}
+  .nav-links a:hover{color:var(--fg)}
+  @media(max-width:560px){.nav-links{gap:13px}.nav-links a{font-size:.76rem}}
+
+  header{padding:44px 0 8px}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .eyebrow::before{content:"> ";color:var(--cyan)}
+  h1{font-size:clamp(1.9rem,4.5vw,2.6rem);font-weight:700;margin:12px 0 10px}
+  header p{color:#3d545f;max-width:640px}
+  .privacy{display:inline-flex;align-items:center;gap:7px;background:rgba(18,161,80,.1);color:var(--ok);font-family:var(--mono);
+    font-size:.76rem;font-weight:600;padding:6px 12px;border-radius:8px;margin-top:16px;border:1px solid rgba(18,161,80,.28)}
+
+  /* Dropzone */
+  .drop{display:block;margin:26px 0;border:1.5px dashed var(--line);border-radius:18px;background:#fff;padding:48px 24px;text-align:center;cursor:pointer;transition:.2s;box-shadow:var(--shadow)}
+  .drop:hover,.drop.over{border-color:var(--accent);background:#f5fbfe;box-shadow:var(--glow-accent)}
+  .drop .ic{font-size:2.4rem}
+  .drop h3{font-size:1.15rem;margin:10px 0 4px}
+  .drop p{color:var(--muted);font-size:.9rem}
+  .drop .btn{display:inline-block;margin-top:16px;background:var(--accent);color:#fff;font-family:var(--mono);font-weight:600;
+    padding:11px 22px;border-radius:10px;font-size:.86rem;letter-spacing:.02em}
+
+  .app{display:none;grid-template-columns:340px 1fr;gap:24px;margin:22px 0 60px;align-items:start}
+  @media(max-width:820px){.app{grid-template-columns:1fr}}
+  .left{position:sticky;top:74px}
+  @media(max-width:820px){.left{position:static}}
+  .imgcard{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+  .imgcard img{width:100%;display:block;background:#0c1116}
+  .imgcard .fn{padding:12px 14px;font-family:var(--mono);font-size:.78rem;color:var(--muted);word-break:break-all}
+  .actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .abtn{flex:1;min-width:120px;text-align:center;border:1px solid var(--line);background:#fff;color:var(--fg);
+    font-family:var(--mono);font-weight:600;font-size:.82rem;padding:11px;border-radius:11px;cursor:pointer;text-decoration:none;letter-spacing:.02em}
+  .abtn:hover{border-color:var(--accent);color:var(--accent)}
+  .abtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .abtn.primary:hover{background:#0b76a6;color:#fff}
+
+  .sec{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:22px;margin-bottom:18px;box-shadow:var(--shadow);overflow:hidden}
+  .sec::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent-bright),var(--cyan))}
+  .sec::after{content:"";position:absolute;top:12px;right:14px;width:6px;height:6px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 8px 1px rgba(57,198,238,.85)}
+  .sec h2{font-size:1.02rem;font-weight:700;display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .sec h2 .tag{font-family:var(--mono);font-size:.64rem;font-weight:700;background:rgba(15,169,182,.12);color:var(--cyan);padding:3px 8px;border-radius:6px;text-transform:uppercase;letter-spacing:.06em}
+  table{width:100%;border-collapse:collapse}
+  td{padding:8px 0;border-bottom:1px solid #eef2f4;font-size:.9rem;vertical-align:top}
+  td.k{color:var(--muted);width:42%;font-weight:600}
+  td.v{font-weight:600;word-break:break-word;font-family:var(--mono);font-size:.85rem}
+  .empty{color:var(--muted);font-size:.9rem}
+  .maplink{display:inline-flex;align-items:center;gap:7px;margin-top:12px;background:var(--field);border:1px solid var(--line);
+    border-radius:11px;padding:10px 14px;text-decoration:none;color:var(--accent);font-family:var(--mono);font-weight:600;font-size:.84rem}
+  .maplink:hover{border-color:var(--accent);box-shadow:var(--glow-accent)}
+  .palette{display:flex;flex-wrap:wrap;gap:10px}
+  .sw{flex:1;min-width:92px;border:1px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;background:#fff}
+  .sw .col{height:64px}
+  .sw .hex{padding:8px 10px;font-family:var(--mono);font-size:.76rem;font-weight:700;text-align:center}
+  .sw .pct{font-family:var(--mono);font-size:.66rem;color:var(--muted);text-align:center;padding-bottom:8px}
+  .ocr-out{white-space:pre-wrap;background:var(--field);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:.88rem;max-height:280px;overflow:auto;margin-top:12px;display:none}
+  .ocr-bar{height:6px;background:#eef2f4;border-radius:99px;overflow:hidden;margin-top:12px;display:none}
+  .ocr-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+  /* Privacy reveal */
+  .sec.reveal.high{border-color:#f3b3ad;background:linear-gradient(#fff,#fff7f6)}
+  .sec.reveal.med{border-color:#f2d59c;background:linear-gradient(#fff,#fffbf1)}
+  .sec.reveal.low{border-color:#a8e0c0;background:linear-gradient(#fff,#f4fdf8)}
+  .verdict{font-family:var(--display);font-weight:700;font-size:1.18rem;display:flex;flex-direction:column;gap:3px;margin-bottom:4px}
+  .verdict.high{color:#c0392b}.verdict.med{color:#b7791f}.verdict.low{color:#12a150}
+  .verdict small{font-family:'Inter',sans-serif;font-weight:500;font-size:.83rem;color:var(--muted)}
+  .findings{list-style:none;margin:14px 0 16px;display:grid;gap:9px}
+  .findings li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem;background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+  .findings li b{font-weight:700}
+  .mapbox{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;height:220px}
+  .mapbox iframe{width:100%;height:100%;border:0;display:block}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#132c38;color:#fff;font-family:var(--mono);
+    padding:10px 18px;border-radius:11px;font-size:.82rem;font-weight:600;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+  .toast.show{opacity:1}
+  footer{padding:26px 0 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.8rem;letter-spacing:.02em;position:relative;z-index:2}
+  footer a{color:var(--accent);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../contact/index.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Open Source Tool</span>
+    <h1>Image Data Extractor</h1>
+    <p>Bongkar data tersembunyi di dalam gambar: metadata EXIF, lokasi GPS, info file, palet warna, sampai teks (OCR).</p>
+    <div class="privacy">🔒 100% di browser · gambar tidak diupload ke mana pun</div>
+  </header>
+
+  <label class="drop" id="drop">
+    <div class="ic">🖼️</div>
+    <h3>Taruh gambar di sini</h3>
+    <p>atau klik untuk pilih file · JPG, PNG, HEIC, WEBP, dll</p>
+    <span class="btn">Pilih Gambar</span>
+    <input type="file" id="file" accept="image/*" hidden>
+  </label>
+
+  <div class="app" id="app">
+    <div class="left">
+      <div class="imgcard">
+        <img id="preview" alt="preview">
+        <div class="fn" id="fname"></div>
+      </div>
+      <div class="actions">
+        <button class="abtn primary" id="btnJson">⬇️ Export JSON</button>
+        <button class="abtn" id="btnReset">Ganti Gambar</button>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="sec reveal" id="sec-privacy" style="display:none">
+        <div class="verdict" id="verdict"></div>
+        <ul class="findings" id="findings"></ul>
+        <button class="abtn primary" id="btnClean" style="max-width:280px">🧼 Bersihkan Metadata &amp; Download</button>
+      </div>
+
+      <div class="sec">
+        <h2><span class="tag">File</span> Info File &amp; Dimensi</h2>
+        <table id="tbl-file"></table>
+      </div>
+
+      <div class="sec">
+        <h2><span class="tag">EXIF</span> Metadata Kamera</h2>
+        <table id="tbl-exif"></table>
+        <div class="empty" id="exif-empty" style="display:none">Tidak ada metadata EXIF di gambar ini (biasanya PNG/screenshot atau sudah dibersihkan).</div>
+      </div>
+
+      <div class="sec" id="sec-gps" style="display:none">
+        <h2><span class="tag">GPS</span> Lokasi Foto</h2>
+        <table id="tbl-gps"></table>
+        <div class="mapbox" id="mapbox"><iframe id="map" title="Peta lokasi foto" loading="lazy"></iframe></div>
+        <a class="maplink" id="maplink" target="_blank" rel="noopener">📍 Buka di Google Maps</a>
+      </div>
+
+      <div class="sec">
+        <h2><span class="tag">Warna</span> Palet Dominan</h2>
+        <div class="palette" id="palette"></div>
+      </div>
+
+      <div class="sec">
+        <h2><span class="tag">OCR</span> Teks dari Gambar</h2>
+        <p class="empty">Baca tulisan di gambar jadi teks.</p>
+        <button class="abtn primary" id="btnOcr" style="margin-top:12px;max-width:200px">🔎 Ekstrak Teks</button>
+        <div class="ocr-bar" id="ocrBar"><i id="ocrProg"></i></div>
+        <div class="ocr-out" id="ocrOut"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Image Data Extractor · dibuat oleh <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> ·
+    <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a>
+  </footer>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var CUR={file:null, data:{}};
+var $=function(id){return document.getElementById(id);};
+function toast(m){var t=$('toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1400);}
+function fmtBytes(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';return (b/1048576).toFixed(2)+' MB';}
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function row(k,v){return '<tr><td class="k">'+k+'</td><td class="v">'+v+'</td></tr>';}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+var drop=$('drop'), fileInput=$('file');
+['dragover','dragenter'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.add('over');});});
+['dragleave','drop'].forEach(function(e){drop.addEventListener(e,function(ev){ev.preventDefault();drop.classList.remove('over');});});
+drop.addEventListener('drop',function(ev){if(ev.dataTransfer.files[0])handle(ev.dataTransfer.files[0]);});
+fileInput.addEventListener('change',function(ev){if(ev.target.files[0])handle(ev.target.files[0]);});
+$('btnReset').addEventListener('click',function(){$('app').style.display='none';drop.style.display='block';fileInput.value='';window.scrollTo({top:0,behavior:'smooth'});});
+
+async function handle(file){
+  if(!file.type.startsWith('image/')){toast('File bukan gambar');return;}
+  CUR.file=file; CUR.data={};
+  drop.style.display='none'; $('app').style.display='grid';
+  var url=URL.createObjectURL(file);
+  $('preview').src=url; $('fname').textContent=file.name;
+  $('ocrOut').style.display='none'; $('ocrOut').textContent=''; $('ocrBar').style.display='none';
+  var img=new Image();
+  img.onload=function(){
+    var w=img.naturalWidth,h=img.naturalHeight,g=gcd(w,h);
+    var mp=(w*h/1e6).toFixed(1);
+    var info={Nama:file.name, Ukuran:fmtBytes(file.size), Format:file.type||'-',
+      Resolusi:w+' × '+h+' px', Megapiksel:mp+' MP', 'Rasio Aspek':(w/g)+':'+(h/g),
+      'Terakhir Diubah': file.lastModified?new Date(file.lastModified).toLocaleString():'-'};
+    CUR.data.file=info;
+    $('tbl-file').innerHTML=Object.keys(info).map(function(k){return row(k,esc(info[k]));}).join('');
+    buildPalette(img);
+  };
+  img.src=url;
+  parseExif(file);
+}
+
+async function parseExif(file){
+  var tbl=$('tbl-exif'); var emptyEl=$('exif-empty');
+  tbl.innerHTML=''; emptyEl.style.display='none';
+  $('sec-gps').style.display='none'; CUR.data.exif=null; CUR.data.gps=null;
+  if(typeof exifr==='undefined'){tbl.innerHTML=row('Info','Library EXIF gagal dimuat (butuh internet).');updatePrivacy('','','',null);return;}
+  try{
+    var x=await exifr.parse(file, {tiff:true, exif:true, gps:true, ifd0:true, xmp:false});
+    if(!x || Object.keys(x).length===0){emptyEl.style.display='block';updatePrivacy('','','',null);return;}
+    var map=[
+      ['Make','Kamera / Merk'],['Model','Model'],['LensModel','Lensa'],
+      ['DateTimeOriginal','Tanggal Diambil'],['FNumber','Aperture','f/'],
+      ['ExposureTime','Shutter'],['ISO','ISO'],['FocalLength','Focal Length','',' mm'],
+      ['FocalLengthIn35mmFormat','Focal (35mm eq)','',' mm'],
+      ['ExposureBiasValue','Exposure Bias',' EV'],['Flash','Flash'],
+      ['WhiteBalance','White Balance'],['Orientation','Orientasi'],
+      ['Software','Software'],['Artist','Artist'],['Copyright','Copyright']
+    ];
+    var out={}; var html='';
+    map.forEach(function(m){
+      var key=m[0], label=m[1], pre=m[2]||'', suf=m[3]||'';
+      var val=x[key];
+      if(val===undefined||val===null||val==='')return;
+      if(key==='ExposureTime' && val<1) val='1/'+Math.round(1/val)+'s';
+      if(key==='DateTimeOriginal' && val instanceof Date) val=val.toLocaleString();
+      if(typeof val==='number') val=Math.round(val*1000)/1000;
+      var disp=pre+val+suf;
+      out[label]=disp; html+=row(label,esc(disp));
+    });
+    if(!html){emptyEl.style.display='block';} else {tbl.innerHTML=html; CUR.data.exif=out;}
+    var gps=null;
+    if(x.latitude!=null && x.longitude!=null){
+      var la=x.latitude.toFixed(6), lo=x.longitude.toFixed(6);
+      gps={latitude:la, longitude:lo};
+      CUR.data.gps={latitude:la, longitude:lo};
+      $('tbl-gps').innerHTML=row('Latitude',la)+row('Longitude',lo)+(x.GPSAltitude?row('Ketinggian',Math.round(x.GPSAltitude)+' m'):'');
+      $('maplink').href='https://www.google.com/maps?q='+la+','+lo;
+      setMap(x.latitude,x.longitude);
+      $('sec-gps').style.display='block';
+    }
+    var device=[x.Make,x.Model].filter(Boolean).join(' ');
+    var dt = x.DateTimeOriginal ? (x.DateTimeOriginal instanceof Date ? x.DateTimeOriginal.toLocaleString() : x.DateTimeOriginal) : '';
+    updatePrivacy(device, dt, x.Software||'', gps);
+  }catch(e){ emptyEl.style.display='block'; updatePrivacy('','','',null); }
+}
+
+function setMap(lat,lon){var d=0.008;var bbox=(lon-d)+','+(lat-d)+','+(lon+d)+','+(lat+d);
+  $('map').src='https://www.openstreetmap.org/export/embed.html?bbox='+bbox+'&layer=mapnik&marker='+lat+','+lon;}
+
+function updatePrivacy(device,datetime,software,gps){
+  var sec=$('sec-privacy'), v=$('verdict'), fl=$('findings');
+  var f=[];
+  if(gps) f.push(['📍','<b>Lokasi persis kamu ketahuan.</b> Bisa dilacak sampai alamat (lat '+gps.latitude+', lon '+gps.longitude+').']);
+  if(device) f.push(['📱','Perangkat: <b>'+esc(device)+'</b>']);
+  if(datetime) f.push(['🕐','Waktu diambil: <b>'+esc(datetime)+'</b>']);
+  if(software) f.push(['🛠️','Software: <b>'+esc(software)+'</b>']);
+  var level,title,sub;
+  if(gps){level='high';title='⚠️ BAHAYA';sub='Foto ini membocorkan lokasimu. Bersihkan dulu sebelum di-posting.';}
+  else if(device||datetime){level='med';title='⚡ PERHATIAN';sub='Ada jejak perangkat/waktu. Tidak ada lokasi, tapi sebaiknya tetap dibersihkan.';}
+  else {level='low';title='✅ AMAN';sub='Tidak ada metadata sensitif. Aman di-posting.';}
+  sec.className='sec reveal '+level;
+  v.className='verdict '+level;
+  v.innerHTML='<span>'+title+'</span><small>'+sub+'</small>';
+  fl.innerHTML=f.length? f.map(function(i){return '<li><span>'+i[0]+'</span><span>'+i[1]+'</span></li>';}).join('') : '<li><span>👍</span><span>Tidak ada data pribadi terdeteksi di gambar ini.</span></li>';
+  CUR.data.privacy={level:level,hasLocation:!!gps,device:device||null,datetime:datetime||null,software:software||null};
+  sec.style.display='block';
+}
+
+function scrubDownload(){
+  if(!CUR.file) return;
+  var img=new Image();
+  img.onload=function(){
+    var c=document.createElement('canvas'); c.width=img.naturalWidth; c.height=img.naturalHeight;
+    c.getContext('2d').drawImage(img,0,0);
+    var png=(CUR.file.type==='image/png');
+    c.toBlob(function(blob){
+      if(!blob){toast('Gagal membersihkan');return;}
+      var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+      a.download=CUR.file.name.replace(/(\.[^.]+)?$/,'')+'-clean.'+(png?'png':'jpg'); a.click();
+      setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+      toast('Foto bersih (tanpa metadata) diunduh');
+    }, png?'image/png':'image/jpeg', 0.92);
+  };
+  img.src=URL.createObjectURL(CUR.file);
+}
+document.getElementById('btnClean').addEventListener('click',scrubDownload);
+
+function buildPalette(img){
+  var c=document.createElement('canvas'); var s=90; var r=img.width/img.height;
+  c.width=r>=1?s:Math.round(s*r); c.height=r>=1?Math.round(s/r):s;
+  var ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
+  var d; try{ d=ctx.getImageData(0,0,c.width,c.height).data; }catch(e){ $('palette').innerHTML='<div class="empty">Tidak bisa membaca warna gambar ini.</div>'; return; }
+  var buckets={}, total=0;
+  for(var i=0;i<d.length;i+=4){
+    if(d[i+3]<125) continue;
+    var r5=d[i]>>4, g5=d[i+1]>>4, b5=d[i+2]>>4;
+    var key=(r5<<8)|(g5<<4)|b5;
+    if(!buckets[key]) buckets[key]={r:0,g:0,b:0,n:0};
+    buckets[key].r+=d[i]; buckets[key].g+=d[i+1]; buckets[key].b+=d[i+2]; buckets[key].n++; total++;
+  }
+  var arr=Object.keys(buckets).map(function(k){var o=buckets[k];return {r:Math.round(o.r/o.n),g:Math.round(o.g/o.n),b:Math.round(o.b/o.n),n:o.n};});
+  arr.sort(function(a,b){return b.n-a.n;});
+  arr=arr.slice(0,6);
+  var toHex=function(o){return '#'+[o.r,o.g,o.b].map(function(v){return v.toString(16).padStart(2,'0');}).join('');};
+  CUR.data.palette=arr.map(function(o){return {hex:toHex(o).toUpperCase(), percent:+(o.n/total*100).toFixed(1)};});
+  $('palette').innerHTML=arr.map(function(o){var hex=toHex(o).toUpperCase();var pct=(o.n/total*100).toFixed(1);
+    return '<div class="sw" onclick="copyHex(\''+hex+'\')"><div class="col" style="background:'+hex+'"></div><div class="hex">'+hex+'</div><div class="pct">'+pct+'%</div></div>';}).join('');
+}
+function copyHex(h){navigator.clipboard&&navigator.clipboard.writeText(h);toast('Disalin: '+h);}
+
+$('btnOcr').addEventListener('click',function(){
+  var btn=this; btn.disabled=true; btn.textContent='Memuat mesin OCR…';
+  $('ocrBar').style.display='block';
+  function run(){
+    btn.textContent='Membaca teks…';
+    Tesseract.recognize(CUR.file,'eng+ind',{logger:function(m){ if(m.status==='recognizing text'){$('ocrProg').style.width=Math.round(m.progress*100)+'%';}}})
+      .then(function(res){
+        var txt=(res.data.text||'').trim();
+        CUR.data.ocr=txt;
+        $('ocrOut').style.display='block'; $('ocrOut').textContent=txt||'(tidak ada teks terdeteksi)';
+        btn.textContent='✅ Selesai · baca ulang'; btn.disabled=false; $('ocrBar').style.display='none';
+      })
+      .catch(function(e){ btn.textContent='Gagal, coba lagi'; btn.disabled=false; $('ocrBar').style.display='none'; toast('OCR gagal'); });
+  }
+  if(typeof Tesseract==='undefined'){
+    var sc=document.createElement('script');
+    sc.src='https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    sc.onload=run; sc.onerror=function(){btn.textContent='Gagal memuat (butuh internet)';btn.disabled=false;$('ocrBar').style.display='none';};
+    document.head.appendChild(sc);
+  } else run();
+});
+
+$('btnJson').addEventListener('click',function(){
+  var blob=new Blob([JSON.stringify(CUR.data,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=(CUR.file?CUR.file.name.replace(/\.[^.]+$/,''):'image')+'-data.json'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+});
+</script>
+</body>
+</html>
