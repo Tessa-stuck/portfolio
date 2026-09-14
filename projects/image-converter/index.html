@@ -130,9 +130,9 @@
         <div class="hint" id="qhint">Buat JPG / WEBP</div>
       </div>
       <div class="ctl">
-        <label>Resize (maks sisi, px)</label>
-        <input type="number" id="maxdim" placeholder="kosong = asli" min="16">
-        <div class="hint">Kosongin kalau nggak mau resize</div>
+        <label>Resize (%)</label>
+        <input type="number" id="pct" placeholder="100 = asli" min="1" max="100">
+        <div class="hint">100 atau kosong = ukuran asli</div>
       </div>
     </div>
 
@@ -221,7 +221,7 @@ async function toDecodable(file){
 function loadImg(src){ return new Promise(function(res,rej){ var url=URL.createObjectURL(src); var im=new Image(); im.onload=function(){res({im:im,url:url});}; im.onerror=function(){URL.revokeObjectURL(url);rej();}; im.src=url; }); }
 
 $('btnConvert').addEventListener('click',async function(){
-  var mime=$('fmt').value, q=(+$('quality').value)/100, maxd=parseInt($('maxdim').value,10)||0;
+  var mime=$('fmt').value, q=(+$('quality').value)/100, pct=parseFloat($('pct').value)||0;
   if(mime==='image/avif' && AVIF_OK===false){ alert('Browser kamu belum bisa encode AVIF. Coba Chrome/Edge terbaru, atau pilih format lain.'); return; }
   this.disabled=true;
   OUT.forEach(function(o){URL.revokeObjectURL(o.url);}); OUT=[];
@@ -233,7 +233,7 @@ $('btnConvert').addEventListener('click',async function(){
       var srcBlob=await toDecodable(q0.file);
       var L=await loadImg(srcBlob);
       var w=L.im.naturalWidth, h=L.im.naturalHeight;
-      if(maxd && Math.max(w,h)>maxd){ var s=maxd/Math.max(w,h); w=Math.round(w*s); h=Math.round(h*s); }
+      if(pct>0 && pct<100){ var s=pct/100; w=Math.max(1,Math.round(w*s)); h=Math.max(1,Math.round(h*s)); }
       var cv=document.createElement('canvas'); cv.width=w; cv.height=h;
       var ctx=cv.getContext('2d');
       if(mime==='image/jpeg'){ ctx.fillStyle='#fff'; ctx.fillRect(0,0,w,h); } // JPG nggak support transparan
