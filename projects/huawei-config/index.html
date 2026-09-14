@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Huawei ONT Config Generator — Tessa</title>
+<meta name="description" content="Generate file config WAN buat Huawei ONT (HG8145V5) yang nggak ada menu Add WAN. PPPoE, Bridge, Static, TR-069 + VLAN & port/SSID binding. Diproses di browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#eef4f6;--card:#fff;--fg:#132c38;--muted:#5a7280;--line:#d0dfe4;
+    --accent:#0e8fca;--accent-bright:#39c6ee;--cyan:#0fa9b6;--field:#f4f7f8;--ok:#12a150;--warn:#d98a24;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--display:'Space Grotesk','Inter',sans-serif;
+    --shadow:0 10px 30px -16px rgba(19,44,56,.28);--glow:0 8px 26px -12px rgba(14,143,202,.5),0 0 0 1px rgba(57,198,238,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--fg);min-height:100vh;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(1100px 620px at 90% -10%,rgba(57,198,238,.20),transparent 60%),radial-gradient(900px 640px at 6% 8%,rgba(15,169,182,.16),transparent 55%),var(--bg);background-attachment:fixed}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(14,143,202,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(14,143,202,.06) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(circle at 50% 12%,#000 30%,transparent 92%)}
+  .wrap{max-width:860px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+  h1,h2{font-family:var(--display);letter-spacing:-.01em}
+  a{color:inherit}
+  nav{position:sticky;top:0;z-index:50;background:rgba(238,244,246,.8);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:860px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{font-family:var(--display);font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-flex;align-items:center;gap:9px;color:var(--fg)}
+  .logo::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px 2px rgba(57,198,238,.85)}
+  .nav-links{display:flex;gap:18px}
+  .nav-links a{font-family:var(--mono);font-size:.82rem;color:var(--muted);text-decoration:none}
+  .nav-links a:hover{color:var(--fg)}
+
+  header{padding:40px 0 6px;text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .eyebrow::before{content:"> ";color:var(--cyan)}
+  h1{font-size:clamp(1.8rem,5vw,2.5rem);font-weight:700;margin:12px 0 8px}
+  header p{color:#3d545f;max-width:600px;margin:0 auto}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:24px;margin:26px 0;position:relative;overflow:hidden}
+  .panel::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent-bright),var(--cyan))}
+
+  .wanhdr{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+  .wanhdr h2{font-size:1.05rem}
+  .wan{border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px;background:var(--field)}
+  .wan .wtop{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .wan .wtag{font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+  .wan .del{border:none;background:#fef2f2;color:#dc2626;font:inherit;font-weight:700;font-size:.72rem;padding:6px 10px;border-radius:8px;cursor:pointer;font-family:var(--mono)}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+  .fg{display:flex;flex-direction:column;gap:6px}
+  .fg.full{grid-column:1/-1}
+  .fg label{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+  .fg input,.fg select{padding:10px 11px;border:1px solid var(--line);border-radius:9px;font:inherit;font-size:.9rem;background:#fff;color:var(--fg)}
+  .fg input:focus,.fg select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(14,143,202,.14)}
+  .hidep{display:none}
+  .bindgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  @media(max-width:560px){.bindgrid{grid-template-columns:repeat(2,1fr)}}
+  .chk{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.74rem;background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 9px;cursor:pointer}
+  .chk input{width:15px;height:15px;accent-color:var(--accent)}
+  .subh{font-family:var(--mono);font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin:10px 0 6px}
+
+  .btn{font-family:var(--mono);font-weight:700;font-size:.9rem;padding:12px 20px;border-radius:11px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--fg);display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--glow)}
+  .btn.primary:hover{background:#0b76a6;color:#fff}
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+
+  .out{margin-top:16px}
+  .out textarea{width:100%;min-height:220px;font-family:var(--mono);font-size:.74rem;line-height:1.5;padding:14px;border:1px solid var(--line);border-radius:12px;background:#0f2733;color:#cfe9f2;white-space:pre;overflow:auto}
+  .warnbox{background:rgba(217,138,36,.1);border:1px solid rgba(217,138,36,.35);color:#8a5a12;border-radius:12px;padding:13px 15px;font-size:.85rem;line-height:1.55;margin-top:14px}
+  .warnbox b{color:#6d460d}
+  .notebox{background:var(--field);border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:.85rem;line-height:1.6;margin-top:16px}
+  .notebox code{background:#e7eef2;padding:1px 6px;border-radius:5px;font-family:var(--mono);font-size:.82em}
+  .notebox b{color:var(--accent)}
+  footer{padding:24px 0 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.8rem}
+  footer a{color:var(--accent);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../wfc/index.html">WFC Place</a>
+      <a href="../../contact/index.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Networking · Open Source</span>
+    <h1>Huawei ONT Config Generator</h1>
+    <p>Buat ONT Huawei (HG8145V5) yang nggak ada menu <b>Add WAN</b>. Isi form → generate file config → import ke ONT. Support PPPoE, Bridge, Static, TR-069 + VLAN & port/SSID binding. Diproses 100% di browser.</p>
+  </header>
+
+  <div class="panel">
+    <div class="wanhdr"><h2>Daftar WAN</h2></div>
+    <div id="wanList"></div>
+    <div class="actions">
+      <button class="btn" id="btnAddWan" type="button">+ Tambah WAN</button>
+      <button class="btn primary" id="btnGen" type="button">⚙ Generate Config</button>
+    </div>
+
+    <div class="out hidep" id="outWrap">
+      <div class="subh">Hasil (XML)</div>
+      <textarea id="out" spellcheck="false" readonly></textarea>
+      <div class="actions">
+        <button class="btn primary" id="btnDownload" type="button">⬇ Download .xml</button>
+        <button class="btn" id="btnCopy" type="button">📋 Salin</button>
+      </div>
+    </div>
+
+    <div class="warnbox">
+      <b>⚠️ Catatan:</b> tes dulu file-nya di ONT sebelum dipakai serius, dan backup config lama kamu. Setiap tipe/firmware bisa beda dikit.
+    </div>
+
+    <div class="notebox">
+      <b>Cara pakai:</b><br>
+      1. Import file ini di ONT: <code>System Management → Configuration File → Update/Import</code>.<br>
+      2. Setelah restart, login akun <b>Support</b> (password default vendor).<br>
+      3. Lihat daftar WAN di <code>192.168.100.1/html/bbsp/wan/wan.asp</code>.<br>
+      4. SSID5–SSID8 = SSID 5GHz. Binding kosong = nggak di-bind ke port/SSID.
+    </div>
+  </div>
+
+  <footer>Huawei ONT Config Generator · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
+</div>
+
+<script>
+var $=function(id){return document.getElementById(id);};
+var WANS=[]; var seq=0;
+
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function newWan(){ seq++; return {id:seq, mode:'pppoe', service:'INTERNET', vlanOn:true, vlan:'', pri:'0',
+  user:'', pass:'', auth:'Auto', nat:true, ip:'', mask:'', gw:'', dns:'', bind:{} }; }
+
+function addWan(){ WANS.push(newWan()); render(); }
+function delWan(id){ WANS=WANS.filter(function(w){return w.id!==id;}); render(); }
+
+var PORTS=['LAN1','LAN2','LAN3','LAN4','SSID1','SSID2','SSID3','SSID4','SSID5','SSID6','SSID7','SSID8'];
+
+function render(){
+  $('wanList').innerHTML=WANS.map(function(w,i){
+    var pppoe=w.mode==='pppoe', stat=w.mode==='static', routed=(w.mode==='pppoe'||w.mode==='static'||w.mode==='tr069');
+    var bindChks=PORTS.map(function(p){
+      return '<label class="chk"><input type="checkbox" data-bind="'+p+'" data-id="'+w.id+'" '+(w.bind[p]?'checked':'')+'>'+p+'</label>';
+    }).join('');
+    return '<div class="wan">'
+      +'<div class="wtop"><span class="wtag">WAN #'+(i+1)+'</span><button class="del" type="button" onclick="delWan('+w.id+')">Hapus</button></div>'
+      +'<div class="grid">'
+        +'<div class="fg"><label>Mode</label><select data-f="mode" data-id="'+w.id+'">'
+          +opt('pppoe','PPPoE',w.mode)+opt('bridge','Bridge',w.mode)+opt('static','Static IP',w.mode)+opt('tr069','TR-069',w.mode)+'</select></div>'
+        +'<div class="fg"><label>Service</label><select data-f="service" data-id="'+w.id+'">'
+          +opt('INTERNET','INTERNET',w.service)+opt('TR069','TR069',w.service)+opt('VOIP','VOIP',w.service)+opt('OTHER','OTHER',w.service)+'</select></div>'
+        +'<div class="fg"><label>VLAN</label><select data-f="vlanOn" data-id="'+w.id+'">'+opt('1','Tagged (pakai VLAN)',w.vlanOn?'1':'0')+opt('0','Untagged',w.vlanOn?'1':'0')+'</select></div>'
+        +'<div class="fg'+(w.vlanOn?'':' hidep')+'"><label>VLAN ID</label><input type="number" min="1" max="4094" data-f="vlan" data-id="'+w.id+'" value="'+esc(w.vlan)+'" placeholder="mis. 100"></div>'
+        +'<div class="fg'+(w.vlanOn?'':' hidep')+'"><label>Priority (802.1p)</label><input type="number" min="0" max="7" data-f="pri" data-id="'+w.id+'" value="'+esc(w.pri)+'"></div>'
+        // PPPoE
+        +'<div class="fg'+(pppoe?'':' hidep')+'"><label>PPPoE Username</label><input type="text" data-f="user" data-id="'+w.id+'" value="'+esc(w.user)+'" placeholder="user@isp"></div>'
+        +'<div class="fg'+(pppoe?'':' hidep')+'"><label>PPPoE Password</label><input type="text" data-f="pass" data-id="'+w.id+'" value="'+esc(w.pass)+'"></div>'
+        +'<div class="fg'+(pppoe?'':' hidep')+'"><label>Auth</label><select data-f="auth" data-id="'+w.id+'">'+opt('Auto','Auto',w.auth)+opt('PAP','PAP',w.auth)+opt('CHAP','CHAP',w.auth)+'</select></div>'
+        // Static
+        +'<div class="fg'+(stat?'':' hidep')+'"><label>IP Address</label><input type="text" data-f="ip" data-id="'+w.id+'" value="'+esc(w.ip)+'" placeholder="203.0.113.10"></div>'
+        +'<div class="fg'+(stat?'':' hidep')+'"><label>Subnet Mask</label><input type="text" data-f="mask" data-id="'+w.id+'" value="'+esc(w.mask)+'" placeholder="255.255.255.0"></div>'
+        +'<div class="fg'+(stat?'':' hidep')+'"><label>Gateway</label><input type="text" data-f="gw" data-id="'+w.id+'" value="'+esc(w.gw)+'" placeholder="203.0.113.1"></div>'
+        +'<div class="fg'+((stat)?'':' hidep')+'"><label>DNS (pisah koma)</label><input type="text" data-f="dns" data-id="'+w.id+'" value="'+esc(w.dns)+'" placeholder="8.8.8.8,1.1.1.1"></div>'
+        // NAT
+        +'<div class="fg'+(routed?'':' hidep')+'"><label>NAT</label><select data-f="nat" data-id="'+w.id+'">'+opt('1','Aktif (Routed)',w.nat?'1':'0')+opt('0','Nonaktif',w.nat?'1':'0')+'</select></div>'
+      +'</div>'
+      +'<div class="subh">Port / SSID Binding</div><div class="bindgrid">'+bindChks+'</div>'
+    +'</div>';
+  }).join('');
+}
+function opt(v,label,cur){ return '<option value="'+v+'"'+(String(cur)===String(v)?' selected':'')+'>'+label+'</option>'; }
+
+// input delegation
+$('wanList').addEventListener('input',function(e){
+  var t=e.target, id=+t.getAttribute('data-id'); if(!id) return;
+  var w=WANS.filter(function(x){return x.id===id;})[0]; if(!w) return;
+  if(t.hasAttribute('data-bind')){ w.bind[t.getAttribute('data-bind')]=t.checked; return; }
+  var f=t.getAttribute('data-f'); if(!f) return;
+  if(f==='vlanOn'){ w.vlanOn=(t.value==='1'); render(); return; }
+  if(f==='nat'){ w.nat=(t.value==='1'); return; }
+  if(f==='mode'){ w.mode=t.value; render(); return; }
+  w[f]=t.value;
+});
+$('btnAddWan').addEventListener('click',addWan);
+
+/* ---------- XML builders (struktur dari config asli HG8145V5) ---------- */
+function bindStr(w){ return PORTS.filter(function(p){return w.bind[p];}).join(','); }
+function vlanVal(w){ return w.vlanOn ? (w.vlan||'0') : '-1'; }
+function vlanMode(w){ return w.vlanOn ? '2' : '0'; }
+
+function pppoeInst(w, macId){
+  var a={
+    Username:w.user, Password:w.pass, PPPAuthenticationProtocol:(w.auth==='Auto'?'Auto':w.auth),
+    NATEnabled:(w.nat?'1':'0'), SERVICE:w.service, VLAN:vlanVal(w), PRI:(w.pri||'0'),
+    BIND:bindStr(w), VMODE:vlanMode(w), MAC:macId
+  };
+  return ''
+  +'<WANPPPConnection NumberOfInstances="1">'
+  +'<WANPPPConnectionInstance InstanceID="1" Enable="1" ConnectionType="IP_Routed" Name="" '
+  +'IdleDisconnectTime="0" NATEnabled="'+a.NATEnabled+'" Username="'+esc(a.Username)+'" Password="'+esc(a.Password)+'" '
+  +'PPPAuthenticationProtocol="'+esc(a.PPPAuthenticationProtocol)+'" MaxMRUSize="1492" DNSEnabled="1" TransportType="PPPoE" '
+  +'ConnectionTrigger="AlwaysOn" X_HW_SERVICELIST="'+esc(a.SERVICE)+'" X_HW_VLAN="'+esc(a.VLAN)+'" X_HW_PRI="'+esc(a.PRI)+'" '
+  +'X_HW_IPMode="0" X_HW_IPv4Enable="1" X_HW_IPv6Enable="0" X_HW_PriPolicy="Specified" X_HW_MacId="'+a.MAC+'" X_HW_WanId="0" '
+  +'X_HW_LanDhcpEnable="1" X_HW_BindPhyPortInfo="'+esc(a.BIND)+'" X_HW_VLANMode="'+a.VMODE+'" X_HW_BridgeEnable="0"/>'
+  +'</WANPPPConnection>';
+}
+function ipInst(w, macId){
+  // bridge / static / tr069 / dhcp-routed
+  var bridge=(w.mode==='bridge');
+  var stat=(w.mode==='static');
+  var ctype=bridge?'IP_Bridged':'IP_Routed';
+  var addr=stat?'Static':'DHCP';
+  var nat=(!bridge && w.nat)?'1':'0';
+  var extra='';
+  if(stat){
+    extra+=' ExternalIPAddress="'+esc(w.ip)+'" SubnetMask="'+esc(w.mask)+'" DefaultGateway="'+esc(w.gw)+'" DNSServers="'+esc(w.dns)+'"';
+  }
+  var tr069flag=(w.mode==='tr069')?'1':'0';
+  return ''
+  +'<WANIPConnection NumberOfInstances="1">'
+  +'<WANIPConnectionInstance InstanceID="1" Enable="1" ConnectionType="'+ctype+'" Name="" NATEnabled="'+nat+'" '
+  +'AddressingType="'+addr+'"'+extra+' DNSEnabled="1" MaxMTUSize="1500" ConnectionTrigger="AlwaysOn" '
+  +'X_HW_SERVICELIST="'+esc(w.service)+'" X_HW_VLAN="'+vlanVal(w)+'" X_HW_PRI="'+esc(w.pri||'0')+'" '
+  +'X_HW_IPMode="0" X_HW_IPv4Enable="1" X_HW_IPv6Enable="0" X_HW_PriPolicy="Specified" X_HW_TR069FLAG="'+tr069flag+'" '
+  +'X_HW_MacId="'+macId+'" X_HW_LanDhcpEnable="0" X_HW_BindPhyPortInfo="'+esc(bindStr(w))+'" X_HW_VLANMode="'+vlanMode(w)+'" '
+  +'X_HW_BridgeEnable="'+(bridge?'1':'0')+'"/>'
+  +'</WANIPConnection>';
+}
+
+function generate(){
+  if(!WANS.length){ alert('Tambah minimal 1 WAN dulu.'); return; }
+  for(var k=0;k<WANS.length;k++){
+    var w=WANS[k];
+    if(w.mode==='pppoe' && !w.user){ alert('WAN #'+(k+1)+': isi username PPPoE.'); return; }
+    if(w.vlanOn && !w.vlan){ alert('WAN #'+(k+1)+': isi VLAN ID atau ganti ke Untagged.'); return; }
+    if(w.mode==='static' && (!w.ip||!w.mask||!w.gw)){ alert('WAN #'+(k+1)+': lengkapi IP/Mask/Gateway.'); return; }
+  }
+  var insts=WANS.map(function(w,i){
+    var mac=i+1;
+    var body=(w.mode==='pppoe')?pppoeInst(w,mac):ipInst(w,mac);
+    var ppp=(w.mode==='pppoe');
+    return '<WANConnectionDeviceInstance InstanceID="'+(i+1)+'" '
+      +'WANIPConnectionNumberOfEntries="'+(ppp?'0':'1')+'" WANPPPConnectionNumberOfEntries="'+(ppp?'1':'0')+'">'
+      +body+'</WANConnectionDeviceInstance>';
+  }).join('');
+  var xml='<?xml version="1.0" encoding="UTF-8"?>\n'
+    +'<InternetGatewayDevice DBEncrypt="0">\n'
+    +'<WANDevice NumberOfInstances="1">\n'
+    +'<WANDeviceInstance InstanceID="1" WANConnectionNumberOfEntries="'+WANS.length+'">\n'
+    +'<WANConnectionDevice NumberOfInstances="'+WANS.length+'">\n'
+    +insts+'\n'
+    +'</WANConnectionDevice>\n'
+    +'</WANDeviceInstance>\n'
+    +'</WANDevice>\n'
+    +'</InternetGatewayDevice>\n';
+  // rapihin indentasi antar-tag biar kebaca
+  var pretty=xml.replace(/></g,'>\n<');
+  $('out').value=pretty;
+  $('outWrap').classList.remove('hidep');
+  $('outWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+$('btnGen').addEventListener('click',generate);
+$('btnDownload').addEventListener('click',function(){
+  var blob=new Blob([$('out').value],{type:'application/xml'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hw_wan_config.xml'; a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);},1200);
+});
+$('btnCopy').addEventListener('click',function(){
+  $('out').select(); try{document.execCommand('copy');}catch(e){}
+  if(navigator.clipboard) navigator.clipboard.writeText($('out').value);
+});
+
+addWan(); // mulai dengan 1 WAN
+</script>
+</body>
+</html>
