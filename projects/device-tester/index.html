@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Device Tester — Tessa</title>
+<meta name="description" content="Cek kelayakan laptop/PC: tes keyboard, dead pixel, layar, storage, baterai, CPU/RAM, touch, mic, kamera, speaker. 100% di browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="../../assets/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" href="../../assets/favicon.png">
+<link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+<style>
+  :root{
+    --bg:#eef4f6;--card:#fff;--fg:#132c38;--muted:#5a7280;--line:#d0dfe4;
+    --accent:#0e8fca;--accent-bright:#39c6ee;--cyan:#0fa9b6;--field:#f4f7f8;--ok:#12a150;--warn:#d98a24;--bad:#df4a41;
+    --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;--display:'Space Grotesk','Inter',sans-serif;
+    --shadow:0 10px 30px -16px rgba(19,44,56,.28);--glow:0 8px 26px -12px rgba(14,143,202,.5),0 0 0 1px rgba(57,198,238,.4);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--fg);min-height:100vh;-webkit-font-smoothing:antialiased;
+    background:radial-gradient(1100px 620px at 90% -10%,rgba(57,198,238,.20),transparent 60%),radial-gradient(900px 640px at 6% 8%,rgba(15,169,182,.16),transparent 55%),var(--bg);background-attachment:fixed}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;background-image:linear-gradient(rgba(14,143,202,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(14,143,202,.06) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(circle at 50% 8%,#000 26%,transparent 92%)}
+  .wrap{max-width:880px;margin:0 auto;padding:0 22px;position:relative;z-index:2}
+  h1,h2{font-family:var(--display);letter-spacing:-.01em}
+  a{color:inherit}
+  nav{position:sticky;top:0;z-index:50;background:rgba(238,244,246,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{max-width:880px;margin:0 auto;padding:13px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{font-family:var(--display);font-weight:700;font-size:1.05rem;text-decoration:none;display:inline-flex;align-items:center;gap:9px;color:var(--fg)}
+  .logo::before{content:"";width:11px;height:11px;border-radius:50%;background:var(--accent-bright);box-shadow:0 0 12px 2px rgba(57,198,238,.85)}
+  .nav-links{display:flex;gap:18px}
+  .nav-links a{font-family:var(--mono);font-size:.82rem;color:var(--muted);text-decoration:none}
+  .nav-links a:hover{color:var(--fg)}
+
+  header{padding:38px 0 4px;text-align:center}
+  .eyebrow{font-family:var(--mono);font-size:.74rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+  .eyebrow::before{content:"> ";color:var(--cyan)}
+  h1{font-size:clamp(1.8rem,5vw,2.5rem);font-weight:700;margin:12px 0 8px}
+  header p{color:#3d545f;max-width:600px;margin:0 auto}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:22px;margin:18px 0;position:relative;overflow:hidden}
+  .panel>h2{font-size:1.12rem;display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  .panel .desc{color:#3d545f;font-size:.88rem;margin-bottom:14px}
+  .panel h2 svg{width:20px;height:20px;color:var(--accent)}
+  .pill{margin-left:auto;font-family:var(--mono);font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
+  .pill.ok{background:rgba(18,161,80,.12);color:var(--ok);border-color:rgba(18,161,80,.4)}
+  .pill.warn{background:rgba(217,138,36,.12);color:var(--warn);border-color:rgba(217,138,36,.4)}
+  .pill.bad{background:rgba(223,74,65,.12);color:var(--bad);border-color:rgba(223,74,65,.4)}
+
+  .btn{font-family:var(--mono);font-weight:700;font-size:.86rem;padding:11px 18px;border-radius:10px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--fg);display:inline-flex;align-items:center;gap:7px}
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:var(--glow)}
+  .btn.primary:hover{background:#0b76a6;color:#fff}
+  .btn.sm{padding:8px 13px;font-size:.78rem}
+  .btn.ok{background:rgba(18,161,80,.1);border-color:rgba(18,161,80,.4);color:var(--ok)}
+  .btn.bad{background:rgba(223,74,65,.1);border-color:rgba(223,74,65,.4);color:var(--bad)}
+  .row{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+  .mark{display:flex;gap:8px;align-items:center;margin-top:14px;font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+
+  /* info grid */
+  .info{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+  .info .kv{background:var(--field);border:1px solid var(--line);border-radius:10px;padding:11px 13px}
+  .info .k{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700}
+  .info .v{font-weight:700;font-size:.92rem;margin-top:3px;word-break:break-word}
+
+  /* keyboard */
+  .kbd{display:flex;flex-direction:column;gap:6px;margin-top:6px;overflow-x:auto}
+  .krow{display:flex;gap:6px;justify-content:center}
+  .key{min-width:34px;height:38px;padding:0 7px;border:1px solid var(--line);border-radius:7px;background:var(--field);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.68rem;color:var(--fg);white-space:nowrap}
+  .key.w{min-width:60px}.key.wx{min-width:86px}.key.space{min-width:220px}
+  .key.hit{background:var(--ok);color:#fff;border-color:var(--ok)}
+  .key.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .kbdinfo{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:10px}
+
+  /* fullscreen overlays */
+  .fs{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center;cursor:pointer}
+  .fs.show{display:flex}
+  .fs .hint{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.6);color:#fff;font-family:var(--mono);font-size:.78rem;padding:8px 14px;border-radius:20px;pointer-events:none}
+  #dpText{color:#fff;font-family:var(--mono);text-align:center;line-height:1.5;padding:20px}
+
+  .swatches{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .sw{width:34px;height:34px;border-radius:8px;border:1px solid rgba(0,0,0,.1);cursor:pointer}
+
+  video{width:100%;max-width:340px;border-radius:12px;border:1px solid var(--line);background:#0f2733;display:block}
+  .meter{height:14px;border-radius:8px;background:#e7eef2;overflow:hidden;margin-top:10px}
+  .meter span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--ok),var(--warn),var(--bad))}
+  #touchpad{width:100%;height:180px;border:1px dashed var(--line);border-radius:12px;background:var(--field);touch-action:none;display:block}
+
+  /* verdict */
+  .verdict{text-align:center;padding:8px 0}
+  .vscore{font-family:var(--display);font-weight:700;font-size:2.6rem;line-height:1}
+  .vlabel{font-family:var(--display);font-weight:700;font-size:1.3rem;margin-top:6px}
+  .vsub{color:#3d545f;font-size:.9rem;margin-top:4px}
+  .checklist{margin-top:16px;display:grid;gap:8px}
+  .cl{display:flex;align-items:center;gap:10px;background:var(--field);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:.88rem}
+  .cl .dot{width:10px;height:10px;border-radius:50%;background:#c7d2d8;flex:none}
+  .cl.ok .dot{background:var(--ok)}.cl.warn .dot{background:var(--warn)}.cl.bad .dot{background:var(--bad)}
+  .cl .st{margin-left:auto;font-family:var(--mono);font-size:.68rem;font-weight:700;text-transform:uppercase;color:var(--muted)}
+  .note{font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-top:12px;line-height:1.5}
+  footer{padding:24px 0 44px;text-align:center;color:var(--muted);font-family:var(--mono);font-size:.8rem}
+  footer a{color:var(--accent);text-decoration:none;font-weight:600}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-inner">
+    <a class="logo" href="../../index.html">Tessa</a>
+    <div class="nav-links">
+      <a href="../../index.html">Home</a>
+      <a href="../index.html">Projects</a>
+      <a href="../../content/index.html">Content</a>
+      <a href="../../wfc/index.html">WFC Place</a>
+      <a href="../../contact/index.html">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">Device Tester</span>
+    <h1>Cek Kelayakan Laptop / PC</h1>
+    <p>Tes keyboard, dead pixel, layar, storage, baterai, CPU/RAM, touch, mic, kamera, speaker — semua di browser. Cocok buat cek barang second sebelum beli/jual.</p>
+  </header>
+
+  <!-- SYSTEM INFO -->
+  <div class="panel">
+    <h2><i data-lucide="cpu"></i> Info Sistem <span class="pill" id="pInfo">auto</span></h2>
+    <div class="info" id="sysinfo"></div>
+  </div>
+
+  <!-- CPU/RAM BENCH -->
+  <div class="panel">
+    <h2><i data-lucide="gauge"></i> Benchmark CPU <span class="pill" id="pCpu">—</span></h2>
+    <div class="desc">Uji kecepatan komputasi ringan (sekitar 3 detik). Makin tinggi skor, makin ngebut.</div>
+    <div class="row"><button class="btn primary" id="btnCpu">▶ Jalankan Benchmark</button><span id="cpuOut" style="font-family:var(--mono);font-weight:700"></span></div>
+  </div>
+
+  <!-- KEYBOARD -->
+  <div class="panel">
+    <h2><i data-lucide="keyboard"></i> Tes Keyboard <span class="pill" id="pKbd">—</span></h2>
+    <div class="desc">Pencet tiap tombol — yang kebaca bakal nyala hijau. Cek ada tombol yang mati/nggak respons.</div>
+    <div class="kbd" id="kbd"></div>
+    <div class="kbdinfo" id="kbdInfo">Ditekan: 0 tombol</div>
+    <div class="mark">
+      <button class="btn sm" id="kbdReset" type="button">Reset</button>
+      Hasil: <button class="btn sm ok" data-mark="keyboard" data-v="ok" type="button">Semua OK</button>
+      <button class="btn sm bad" data-mark="keyboard" data-v="bad" type="button">Ada yang mati</button>
+    </div>
+  </div>
+
+  <!-- SCREEN / DEAD PIXEL -->
+  <div class="panel">
+    <h2><i data-lucide="monitor"></i> Tes Layar / Dead Pixel <span class="pill" id="pScreen">—</span></h2>
+    <div class="desc">Layar bakal fullscreen warna solid. Cari titik yang nggak ikut berubah warna (dead/stuck pixel), garis, atau area terang (backlight bleed). Klik/panah buat ganti warna, Esc buat keluar.</div>
+    <div class="row">
+      <button class="btn primary" id="btnScreen">▶ Mulai Tes Layar</button>
+      <button class="btn" id="btnGrad">Gradient</button>
+      <button class="btn" id="btnText">Ketajaman Teks</button>
+    </div>
+    <div class="swatches" id="swatches"></div>
+    <div class="mark">
+      Hasil: <button class="btn sm ok" data-mark="screen" data-v="ok" type="button">Layar bersih</button>
+      <button class="btn sm bad" data-mark="screen" data-v="bad" type="button">Ada dead pixel/bleed</button>
+    </div>
+  </div>
+
+  <!-- STORAGE -->
+  <div class="panel">
+    <h2><i data-lucide="hard-drive"></i> Storage <span class="pill" id="pStorage">—</span></h2>
+    <div class="desc">Kapasitas yang tersedia + tes kecepatan baca/tulis (perkiraan, lewat browser). Catatan: health SMART (bad sector/suhu) butuh app desktop kayak CrystalDiskInfo.</div>
+    <div class="info" id="storeInfo"></div>
+    <div class="row" style="margin-top:12px"><button class="btn primary" id="btnStore">▶ Tes Kecepatan</button><span id="storeOut" style="font-family:var(--mono);font-weight:700"></span></div>
+  </div>
+
+  <!-- BATTERY -->
+  <div class="panel">
+    <h2><i data-lucide="battery-charging"></i> Baterai <span class="pill" id="pBatt">—</span></h2>
+    <div class="desc">Level &amp; status charging. Catatan: <b>kesehatan/wear baterai</b> nggak bisa dibaca browser — buat itu cek di OS (mis. <code>powercfg /batteryreport</code> di Windows).</div>
+    <div class="info" id="battInfo"></div>
+  </div>
+
+  <!-- PERIPHERALS -->
+  <div class="panel">
+    <h2><i data-lucide="scan-line"></i> Touch · Mic · Kamera · Speaker <span class="pill" id="pPeri">—</span></h2>
+    <div class="desc">Tes perangkat tambahan. Mic &amp; kamera butuh izin browser (jalan di situs https, bukan file lokal).</div>
+
+    <div style="margin-bottom:14px">
+      <div style="font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:6px">TOUCHSCREEN / TOUCHPAD — coret area buat cek respons</div>
+      <canvas id="touchpad"></canvas>
+      <div class="row" style="margin-top:8px"><button class="btn sm" id="touchClear">Bersihin</button><span id="touchInfo" style="font-family:var(--mono);font-size:.72rem;color:var(--muted)"></span></div>
+    </div>
+
+    <div class="row" style="gap:14px;align-items:flex-start;flex-wrap:wrap">
+      <div>
+        <div style="font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:6px">MIKROFON</div>
+        <button class="btn sm" id="btnMic">🎤 Tes Mic</button>
+        <div class="meter" style="width:200px"><span id="micBar"></span></div>
+      </div>
+      <div>
+        <div style="font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:6px">SPEAKER (L / R)</div>
+        <div class="row"><button class="btn sm" id="btnSpkL">🔈 Kiri</button><button class="btn sm" id="btnSpkR">Kanan 🔉</button></div>
+      </div>
+    </div>
+
+    <div style="margin-top:14px">
+      <div style="font-family:var(--mono);font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:6px">KAMERA</div>
+      <button class="btn sm" id="btnCam">📷 Nyalain Kamera</button>
+      <video id="cam" autoplay playsinline muted style="margin-top:10px;display:none"></video>
+    </div>
+  </div>
+
+  <!-- VERDICT -->
+  <div class="panel">
+    <h2><i data-lucide="clipboard-check"></i> Verdict — Layak atau Nggak?</h2>
+    <div class="desc">Ringkasan dari tes yang udah kamu tandain + spek auto. Tandain hasil tiap tes di atas biar akurat.</div>
+    <div class="verdict">
+      <div class="vscore" id="vScore" style="color:var(--muted)">–</div>
+      <div class="vlabel" id="vLabel">Belum dinilai</div>
+      <div class="vsub" id="vSub">Klik "Hitung Verdict" setelah selesai tes.</div>
+    </div>
+    <div class="checklist" id="checklist"></div>
+    <div class="row" style="margin-top:16px;justify-content:center">
+      <button class="btn primary" id="btnVerdict">✓ Hitung Verdict</button>
+      <button class="btn" id="btnCopySum">📋 Salin Ringkasan</button>
+    </div>
+    <div class="note">🔒 Semua tes jalan di browser, nggak ada data yang dikirim ke server.</div>
+  </div>
+
+  <footer>Device Tester · <a href="https://instagram.com/arschbx" target="_blank" rel="noopener">@arschbx</a> · <a href="https://github.com/Tessa-stuck" target="_blank" rel="noopener">Tessa-stuck</a></footer>
+</div>
+
+<!-- Fullscreen dead-pixel overlay -->
+<div class="fs" id="fs">
+  <div class="hint" id="fsHint">Klik / → ganti warna · Esc keluar</div>
+  <div id="dpText"></div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+if(window.lucide) lucide.createIcons();
+var $=function(id){return document.getElementById(id);};
+var RESULTS={cpu:null,keyboard:null,screen:null,storage:null,battery:null,touch:null,mic:null,camera:null,speaker:null};
+function setPill(id,cls,txt){var e=$(id);e.className='pill '+(cls||'');e.textContent=txt;}
+
+/* ---------------- SYSTEM INFO ---------------- */
+function glRenderer(){
+  try{var c=document.createElement('canvas');var gl=c.getContext('webgl')||c.getContext('experimental-webgl');
+    var dbg=gl.getExtension('WEBGL_debug_renderer_info');
+    return dbg?gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL):(gl.getParameter(gl.RENDERER)||'—');}catch(e){return '—';}
+}
+(function sysinfo(){
+  var ua=navigator.userAgent;
+  var os='—';
+  if(/Windows NT 10/.test(ua))os='Windows 10/11'; else if(/Windows/.test(ua))os='Windows';
+  else if(/Mac OS X/.test(ua))os='macOS'; else if(/Android/.test(ua))os='Android';
+  else if(/iPhone|iPad/.test(ua))os='iOS'; else if(/Linux/.test(ua))os='Linux';
+  var br='—';
+  if(/Edg\//.test(ua))br='Edge'; else if(/OPR\//.test(ua))br='Opera'; else if(/Chrome\//.test(ua))br='Chrome';
+  else if(/Firefox\//.test(ua))br='Firefox'; else if(/Safari\//.test(ua))br='Safari';
+  var rows=[
+    ['OS',os],['Browser',br],
+    ['CPU Cores', navigator.hardwareConcurrency||'—'],
+    ['RAM (approx)', navigator.deviceMemory?(navigator.deviceMemory+' GB'):'nggak kebaca'],
+    ['GPU', glRenderer()],
+    ['Layar', screen.width+' × '+screen.height+' px'],
+    ['Pixel Ratio', (window.devicePixelRatio||1)+'×'],
+    ['Warna', (screen.colorDepth||24)+'-bit'],
+    ['Touch', (('ontouchstart'in window)||navigator.maxTouchPoints>0)?('Ya ('+(navigator.maxTouchPoints||1)+' titik)'):'Nggak'],
+    ['Koneksi', (navigator.connection&&navigator.connection.effectiveType)||'—'],
+    ['Bahasa', navigator.language||'—']
+  ];
+  $('sysinfo').innerHTML=rows.map(function(r){return '<div class="kv"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>';}).join('');
+})();
+
+/* ---------------- CPU BENCH ---------------- */
+$('btnCpu').addEventListener('click',function(){
+  var btn=this; btn.disabled=true; $('cpuOut').textContent='menghitung…';
+  setTimeout(function(){
+    var end=performance.now()+2500, ops=0, x=0;
+    while(performance.now()<end){ for(var i=0;i<100000;i++){ x+=Math.sqrt(i*1.1)+Math.sin(i);} ops++; }
+    var score=Math.round(ops*100000/1e6); // Mops total-ish
+    var mops=Math.round(score/2.5);
+    var cls=mops>=2500?'ok':(mops>=1000?'warn':'bad');
+    var rate=mops>=2500?'Ngebut':(mops>=1000?'Cukup':'Lemot');
+    $('cpuOut').textContent=mops.toLocaleString()+' Mops/s · '+rate;
+    setPill('pCpu',cls,rate); RESULTS.cpu=cls;
+    btn.disabled=false;
+  },40);
+});
+
+/* ---------------- KEYBOARD ---------------- */
+var KROWS=[
+  [['Esc','Escape','w'],['`','Backquote'],['1','Digit1'],['2','Digit2'],['3','Digit3'],['4','Digit4'],['5','Digit5'],['6','Digit6'],['7','Digit7'],['8','Digit8'],['9','Digit9'],['0','Digit0'],['-','Minus'],['=','Equal'],['⌫','Backspace','wx']],
+  [['Tab','Tab','w'],['Q','KeyQ'],['W','KeyW'],['E','KeyE'],['R','KeyR'],['T','KeyT'],['Y','KeyY'],['U','KeyU'],['I','KeyI'],['O','KeyO'],['P','KeyP'],['[','BracketLeft'],[']','BracketRight'],['\\','Backslash','w']],
+  [['Caps','CapsLock','wx'],['A','KeyA'],['S','KeyS'],['D','KeyD'],['F','KeyF'],['G','KeyG'],['H','KeyH'],['J','KeyJ'],['K','KeyK'],['L','KeyL'],[';','Semicolon'],["'",'Quote'],['Enter','Enter','wx']],
+  [['Shift','ShiftLeft','wx'],['Z','KeyZ'],['X','KeyX'],['C','KeyC'],['V','KeyV'],['B','KeyB'],['N','KeyN'],['M','KeyM'],[',','Comma'],['.','Period'],['/','Slash'],['Shift','ShiftRight','wx']],
+  [['Ctrl','ControlLeft','w'],['Win','MetaLeft','w'],['Alt','AltLeft','w'],['Space','Space','space'],['Alt','AltRight','w'],['Ctrl','ControlRight','w'],['←','ArrowLeft'],['↑','ArrowUp'],['↓','ArrowDown'],['→','ArrowRight']]
+];
+var kbdActive=false, hitset={};
+(function buildKbd(){
+  $('kbd').innerHTML=KROWS.map(function(row){
+    return '<div class="krow">'+row.map(function(k){
+      var cls='key'+(k[2]?(' '+k[2]):'');
+      return '<div class="'+cls+'" data-code="'+k[1]+'">'+k[0]+'</div>';
+    }).join('')+'</div>';
+  }).join('');
+})();
+function kbdCount(){ var n=Object.keys(hitset).length; $('kbdInfo').textContent='Ditekan: '+n+' tombol'; }
+window.addEventListener('keydown',function(e){
+  var el=document.querySelector('.key[data-code="'+CSS.escape(e.code)+'"]');
+  if(el){ e.preventDefault(); el.classList.add('active','hit'); hitset[e.code]=1; kbdCount(); }
+});
+window.addEventListener('keyup',function(e){
+  var el=document.querySelector('.key[data-code="'+CSS.escape(e.code)+'"]'); if(el) el.classList.remove('active');
+});
+$('kbdReset').addEventListener('click',function(){ hitset={}; document.querySelectorAll('.key').forEach(function(k){k.classList.remove('hit','active');}); kbdCount(); });
+
+/* ---------------- SCREEN / DEAD PIXEL ---------------- */
+var COLORS=['#ff0000','#00ff00','#0000ff','#ffffff','#000000','#00ffff','#ff00ff','#ffff00','#808080'];
+(function sw(){ $('swatches').innerHTML=COLORS.map(function(c,i){return '<div class="sw" style="background:'+c+'" data-i="'+i+'" title="'+c+'"></div>';}).join(''); })();
+var dpi=0, dpMode='color';
+function openFS(mode){ dpMode=mode||'color'; dpi=0; paintFS(); $('fs').classList.add('show');
+  var el=document.documentElement; if(el.requestFullscreen) el.requestFullscreen().catch(function(){});
+}
+function closeFS(){ $('fs').classList.remove('show'); $('dpText').innerHTML=''; if(document.fullscreenElement&&document.exitFullscreen) document.exitFullscreen().catch(function(){}); }
+function paintFS(){
+  var fs=$('fs'), txt=$('dpText');
+  if(dpMode==='color'){ fs.style.background=COLORS[dpi]; txt.innerHTML=''; $('fsHint').textContent=(dpi+1)+'/'+COLORS.length+' · '+COLORS[dpi]+' — klik/→ ganti · Esc keluar'; }
+  else if(dpMode==='grad'){ fs.style.background='linear-gradient(90deg,#000,#fff)'; txt.innerHTML=''; $('fsHint').textContent='Gradient — cari banding/garis · Esc keluar'; }
+  else if(dpMode==='text'){ fs.style.background='#fff'; txt.style.color='#111';
+    txt.innerHTML='<div style="font-size:11px">'+Array(6).join('Ketajaman teks 11px — AaBbCc 0123456789 · ')+'</div><div style="font-size:14px;margin-top:10px">Teks 14px — cek buram/ghosting</div>';
+    $('fsHint').textContent='Ketajaman teks — Esc keluar'; }
+}
+$('btnScreen').addEventListener('click',function(){openFS('color');});
+$('btnGrad').addEventListener('click',function(){openFS('grad');});
+$('btnText').addEventListener('click',function(){openFS('text');});
+$('swatches').addEventListener('click',function(e){ var d=e.target.getAttribute('data-i'); if(d!=null){ dpMode='color'; dpi=+d; openFS('color'); }});
+$('fs').addEventListener('click',function(){ if(dpMode==='color'){ dpi=(dpi+1)%COLORS.length; paintFS(); } else closeFS(); });
+window.addEventListener('keydown',function(e){
+  if(!$('fs').classList.contains('show'))return;
+  if(e.key==='Escape') closeFS();
+  else if(dpMode==='color'&&(e.key==='ArrowRight'||e.key===' ')){ e.preventDefault(); dpi=(dpi+1)%COLORS.length; paintFS(); }
+  else if(dpMode==='color'&&e.key==='ArrowLeft'){ e.preventDefault(); dpi=(dpi-1+COLORS.length)%COLORS.length; paintFS(); }
+});
+
+/* ---------------- STORAGE ---------------- */
+(async function storeInfo(){
+  var rows=[];
+  try{ if(navigator.storage&&navigator.storage.estimate){ var est=await navigator.storage.estimate();
+    rows.push(['Kuota tersedia', (est.quota/1073741824).toFixed(1)+' GB']);
+    rows.push(['Terpakai (browser)', (est.usage/1048576).toFixed(0)+' MB']);
+  } else rows.push(['Estimasi','nggak didukung']); }catch(e){ rows.push(['Estimasi','nggak didukung']); }
+  $('storeInfo').innerHTML=rows.map(function(r){return '<div class="kv"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>';}).join('');
+})();
+function idb(){ return new Promise(function(res,rej){ var r=indexedDB.open('devtest',1);
+  r.onupgradeneeded=function(){ r.result.createObjectStore('b'); }; r.onsuccess=function(){res(r.result);}; r.onerror=function(){rej();}; }); }
+function idbPut(db,key,val){ return new Promise(function(res,rej){ var tx=db.transaction('b','readwrite'); tx.objectStore('b').put(val,key); tx.oncomplete=res; tx.onerror=rej; }); }
+function idbGet(db,key){ return new Promise(function(res,rej){ var tx=db.transaction('b','readonly'); var g=tx.objectStore('b').get(key); g.onsuccess=function(){res(g.result);}; g.onerror=rej; }); }
+function idbDel(db,key){ return new Promise(function(res){ var tx=db.transaction('b','readwrite'); tx.objectStore('b').delete(key); tx.oncomplete=res; tx.onerror=res; }); }
+$('btnStore').addEventListener('click',async function(){
+  var btn=this; btn.disabled=true; $('storeOut').textContent='menguji…';
+  try{
+    var MB=64, buf=new Uint8Array(MB*1048576); for(var i=0;i<buf.length;i+=4096) buf[i]=i&255;
+    var db=await idb();
+    var t0=performance.now(); await idbPut(db,'blob',buf); var wsec=(performance.now()-t0)/1000;
+    var t1=performance.now(); var r=await idbGet(db,'blob'); var rsec=(performance.now()-t1)/1000;
+    await idbDel(db,'blob'); db.close();
+    var wsp=(MB/wsec), rsp=(MB/rsec);
+    $('storeOut').textContent='Tulis '+wsp.toFixed(0)+' MB/s · Baca '+rsp.toFixed(0)+' MB/s';
+    var cls=wsp>=150?'ok':(wsp>=40?'warn':'bad'); setPill('pStorage',cls,cls==='ok'?'Cepat':(cls==='warn'?'Sedang':'Lambat')); RESULTS.storage=cls;
+  }catch(e){ $('storeOut').textContent='gagal (browser batasi)'; setPill('pStorage','warn','—'); }
+  btn.disabled=false;
+});
+
+/* ---------------- BATTERY ---------------- */
+(async function batt(){
+  try{
+    if(navigator.getBattery){ var b=await navigator.getBattery();
+      function up(){ var lvl=Math.round(b.level*100);
+        $('battInfo').innerHTML=[['Level',lvl+'%'],['Status',b.charging?'Charging ⚡':'Discharging'],
+          ['Est. penuh', b.charging&&b.chargingTime!==Infinity?Math.round(b.chargingTime/60)+' min':'—'],
+          ['Est. habis', !b.charging&&b.dischargingTime!==Infinity?Math.round(b.dischargingTime/60)+' min':'—']]
+          .map(function(r){return '<div class="kv"><div class="k">'+r[0]+'</div><div class="v">'+r[1]+'</div></div>';}).join('');
+        setPill('pBatt', lvl>=20?'ok':'warn', lvl+'%'); RESULTS.battery= lvl>=20?'ok':'warn';
+      }
+      up(); b.addEventListener('levelchange',up); b.addEventListener('chargingchange',up);
+    } else { $('battInfo').innerHTML='<div class="kv"><div class="k">Baterai</div><div class="v">API nggak didukung (mungkin PC / browser tertentu)</div></div>'; setPill('pBatt','','n/a'); }
+  }catch(e){ $('battInfo').innerHTML='<div class="kv"><div class="k">Baterai</div><div class="v">nggak kebaca</div></div>'; }
+})();
+
+/* ---------------- TOUCH ---------------- */
+(function touch(){
+  var cv=$('touchpad'); var ctx=cv.getContext('2d'); var maxpts=0;
+  function fit(){ cv.width=cv.clientWidth; cv.height=cv.clientHeight; }
+  setTimeout(fit,60); window.addEventListener('resize',fit);
+  function dot(x,y){ ctx.fillStyle='#0e8fca'; ctx.beginPath(); ctx.arc(x,y,6,0,7); ctx.fill(); }
+  function pos(e,t){ var r=cv.getBoundingClientRect(); return [ (t.clientX-r.left), (t.clientY-r.top) ]; }
+  cv.addEventListener('pointerdown',function(e){ var p=pos(e,e); dot(p[0],p[1]); RESULTS.touch='ok'; });
+  cv.addEventListener('pointermove',function(e){ if(e.pressure>0||e.buttons){ var p=pos(e,e); dot(p[0],p[1]); }});
+  cv.addEventListener('touchstart',function(e){ maxpts=Math.max(maxpts,e.touches.length); $('touchInfo').textContent='Max titik sentuh: '+maxpts; RESULTS.touch='ok';},{passive:true});
+  cv.addEventListener('touchmove',function(e){ maxpts=Math.max(maxpts,e.touches.length); for(var i=0;i<e.touches.length;i++){var p=pos(e,e.touches[i]);dot(p[0],p[1]);} $('touchInfo').textContent='Max titik sentuh: '+maxpts;},{passive:true});
+  $('touchClear').addEventListener('click',function(){ ctx.clearRect(0,0,cv.width,cv.height); });
+})();
+
+/* ---------------- MIC ---------------- */
+$('btnMic').addEventListener('click',async function(){
+  try{
+    var stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    var ac=new (window.AudioContext||window.webkitAudioContext)();
+    var src=ac.createMediaStreamSource(stream); var an=ac.createAnalyser(); an.fftSize=512; src.connect(an);
+    var data=new Uint8Array(an.frequencyBinCount);
+    this.textContent='🎤 Mendengarkan…'; RESULTS.mic='ok';
+    (function loop(){ an.getByteFrequencyData(data); var v=0; for(var i=0;i<data.length;i++)v=Math.max(v,data[i]);
+      $('micBar').style.width=Math.round(v/255*100)+'%'; requestAnimationFrame(loop); })();
+  }catch(e){ alert('Mic ditolak / nggak ada. (Butuh https & izin.)'); }
+});
+
+/* ---------------- SPEAKER L/R ---------------- */
+function tone(pan){
+  try{ var ac=new (window.AudioContext||window.webkitAudioContext)();
+    var o=ac.createOscillator(), g=ac.createGain(), p=ac.createStereoPanner();
+    o.frequency.value=440; g.gain.value=0.15; p.pan.value=pan;
+    o.connect(g); g.connect(p); p.connect(ac.destination); o.start();
+    setTimeout(function(){o.stop(); ac.close();},800); RESULTS.speaker='ok';
+  }catch(e){}
+}
+$('btnSpkL').addEventListener('click',function(){tone(-1);});
+$('btnSpkR').addEventListener('click',function(){tone(1);});
+
+/* ---------------- CAMERA ---------------- */
+$('btnCam').addEventListener('click',async function(){
+  try{ var stream=await navigator.mediaDevices.getUserMedia({video:true});
+    var v=$('cam'); v.srcObject=stream; v.style.display='block'; this.textContent='📷 Kamera aktif'; RESULTS.camera='ok';
+  }catch(e){ alert('Kamera ditolak / nggak ada. (Butuh https & izin.)'); }
+});
+
+/* ---------------- MARK BUTTONS ---------------- */
+document.querySelectorAll('[data-mark]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var k=b.getAttribute('data-mark'), v=b.getAttribute('data-v'); RESULTS[k]=v;
+    var pid={keyboard:'pKbd',screen:'pScreen'}[k]; if(pid) setPill(pid, v, v==='ok'?'OK':'Bermasalah');
+  });
+});
+
+/* ---------------- VERDICT ---------------- */
+var LABELS={cpu:'CPU',keyboard:'Keyboard',screen:'Layar / Dead pixel',storage:'Storage',battery:'Baterai',touch:'Touch',mic:'Mikrofon',camera:'Kamera',speaker:'Speaker'};
+$('btnVerdict').addEventListener('click',function(){
+  var keys=Object.keys(LABELS), tested=0, score=0, bad=0, warn=0;
+  var rows=keys.map(function(k){
+    var v=RESULTS[k], cls=v||'', st='belum';
+    if(v==='ok'){tested++;score+=1;st='OK';} else if(v==='warn'){tested++;score+=0.5;warn++;st='catatan';}
+    else if(v==='bad'){tested++;bad++;st='bermasalah';}
+    return '<div class="cl '+cls+'"><span class="dot"></span>'+LABELS[k]+'<span class="st">'+st+'</span></div>';
+  }).join('');
+  $('checklist').innerHTML=rows;
+  if(!tested){ $('vScore').textContent='–'; $('vLabel').textContent='Belum ada tes'; $('vSub').textContent='Jalankan & tandai tes dulu.'; return; }
+  var pct=Math.round(score/tested*100);
+  var lbl,col,sub;
+  if(bad>=1||pct<50){ lbl='Kurang Layak'; col='var(--bad)'; sub=bad+' komponen bermasalah. Pertimbangin ulang / nego harga.'; }
+  else if(warn>=1||pct<85){ lbl='Layak dengan Catatan'; col='var(--warn)'; sub='Sebagian besar oke, ada beberapa catatan.'; }
+  else { lbl='Layak 👍'; col='var(--ok)'; sub='Semua tes yang dijalankan lolos.'; }
+  $('vScore').style.color=col; $('vScore').textContent=pct; $('vLabel').style.color=col; $('vLabel').textContent=lbl; $('vSub').textContent=sub+' ('+tested+'/'+keys.length+' tes ditandai)';
+});
+$('btnCopySum').addEventListener('click',function(){
+  var lines=['Device Tester — Ringkasan'];
+  document.querySelectorAll('#sysinfo .kv').forEach(function(kv){ lines.push(kv.querySelector('.k').textContent+': '+kv.querySelector('.v').textContent); });
+  lines.push('---');
+  Object.keys(LABELS).forEach(function(k){ lines.push(LABELS[k]+': '+(RESULTS[k]||'belum ditandai')); });
+  lines.push('Verdict: '+$('vLabel').textContent+' ('+$('vScore').textContent+')');
+  var s=lines.join('\n'); if(navigator.clipboard) navigator.clipboard.writeText(s);
+  this.textContent='✓ Tersalin';
+  var b=this; setTimeout(function(){b.textContent='📋 Salin Ringkasan';},1500);
+});
+</script>
+</body>
+</html>
